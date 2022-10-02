@@ -348,16 +348,25 @@ app.get('/getNotifications', async (req, res) => {
 
 //PAYMENTS
 app.post('/createPaymentSession', async (req, res) => {
+    const {element, quantity, totalPrice} = req.body
     try {
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             mode: 'payment',
+            line_items: [
+                {
+                    element: element,
+                    quantity: quantity,
+                    totalPrice: totalPrice
+                }
+            ],
             success_url: 'http://localhost:3000/dashboard',
             cancel_url: 'http://localhost:3000/payment'
         })
+        res.status(200).json({message:'success'})
     } catch(err) {
         console.log(err)
-        res.json({message:"OOPS"})
+        res.status(500).json({message:"OOPS"})
     }
 })
 

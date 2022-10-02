@@ -1,7 +1,8 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {useForm} from 'react-hook-form'
 import styled from 'styled-components'
 import Header from '../../elements/Header/Header'
+import StockCryptoHandler from '../../handlers/StockCryptoHandler'
 
 const ChoiceContainer = styled.div`
     float:left;
@@ -32,11 +33,24 @@ const FormInput = styled.input`
 
 function Payment(props) {
 
+    const stock_crypto_handler = new StockCryptoHandler()
+
     const {register, handleSubmit} = useForm()
+
+    const [quantity, setQuantity] = useState(0)
     let totalPrice
 
     const onSubmit = (data) => {
         console.log(data)
+        stock_crypto_handler.paymentSession({
+            element: props.cryptocurrency,
+            quantity: quantity,
+            totalPrice: totalPrice
+        }).then(res => {
+            console.log(res)
+        }).catch(err => {
+            console.log(err)
+        })
     }
 
 
@@ -44,10 +58,13 @@ function Payment(props) {
         <>
             <Header/>
             <ChoiceContainer>
-                <p>Crypto: {props.cryptocurrency}</p>
-                <p>Amount: </p>
-                <input placeholder='Amount'/>
-                <p>Total price: </p>
+                <p>Element: {props.cryptocurrency}</p>
+                <p>Quantity: </p>
+                <input placeholder='Quantity' onChange={(e) => {
+                    setQuantity(e.target.value)
+                    totalPrice = Number(props.price)*quantity
+                }}/>
+                <p>Total price: {totalPrice}</p>
             </ChoiceContainer>
             <FormContainer onSubmit={handleSubmit(onSubmit)}>
                 <FormInput placeholder='Card number'/>

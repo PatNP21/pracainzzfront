@@ -2,6 +2,9 @@ import axios from 'axios'
 
 export default class StockCryptoHandler {
 
+    //backendURL
+    baseURL = 'http://localhost:2023'
+
     //TwelveData APIkey
     api_key = 'b6b8fb83c2044518a6c60785a4e9f5fa'
 
@@ -27,5 +30,9 @@ export default class StockCryptoHandler {
 
     getCryptocurrencies() {
         return axios.get(this.cryptocurrencies)
+    }
+
+    paymentSession() {
+        return axios.post(`${this.baseURL}/createPaymentSession`)
     }
 }
