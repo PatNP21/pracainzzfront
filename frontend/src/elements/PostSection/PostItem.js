@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import styled from 'styled-components'
 import CommentSection from '../CommentSection/CommentSection'
+import { useCookies } from 'react-cookie'
 import avatar from './../../avatar.png'
 import PostHandler from '../../handlers/PostHandler'
 
@@ -39,6 +40,9 @@ const Content = styled.p`
 function PostItem(props) {
 
     const post_handler = new PostHandler()
+
+    const [cookies] = useCookies()
+
     const [loadedState, setLoadedState] = useState(false)
 
     const [author, setAuthor] = useState()
@@ -62,6 +66,7 @@ function PostItem(props) {
         {loadedState && <Container>
             <Avatar src={avatar}/>
             <AuthorHeader>{author}</AuthorHeader>
+            {props.author !== cookies.loginData[0].id && <button>Donate</button>}
             <CreatingDate>{props.creatingDate}</CreatingDate>
             <Content>
                 <img src={`${props.multimedia}:image/png;base64,${fromBuffer}`}/>

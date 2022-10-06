@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import Header from '../../elements/Header/Header'
+import { useNavigate } from 'react-router-dom'
 import StockCryptoHandler from '../../handlers/StockCryptoHandler'
 import {Circles} from 'react-loader-spinner'
 import Chart from './../../elements/Chart'
@@ -10,7 +11,6 @@ const MenuContainer = styled.div`
   margin:2vh auto;
   height:12vh;
 `
-
 const OptionToChoose = styled.div`
   float:left;
   width:fit-content;
@@ -56,6 +56,8 @@ const ChartDiv = styled.div`
 function Crypto() {
 
   const operateHandler = new StockCryptoHandler()
+
+  const navigate = useNavigate()
 
   const [loaded, updateLoaded] = useState(false)
   const [showChart, updateShowChart] = useState(false)
@@ -144,7 +146,11 @@ function Crypto() {
           </MenuContainer>
 
           <BtnsSection>
-            <OptionButton>Buy Crypto</OptionButton>
+            <OptionButton onClick={() => {
+                navigate('/cryptoPayment', {state: {cryptocurrency: crypto, price: cryptoData[cryptoData.length-1].open}})
+            }}>
+              Buy Crypto
+            </OptionButton>
             <OptionButton>Sell Crypto</OptionButton>
           </BtnsSection>
           

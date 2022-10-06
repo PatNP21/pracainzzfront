@@ -12,8 +12,8 @@ import NewPassword from './components/RecoverPassword/NewPassword';
 import Stock from './components/Stock/Stock';
 import Friends from './components/Friends/Friends';
 import Notifications from './components/Notifications/Notifications';
-import Payment from './components/Payment/Payment';
 import PaymentFeedback from './components/Payment/PaymentFeedback';
+import CryptoPayment from './components/Payment/CryptoPayment';
 
 function App() {
 
@@ -25,7 +25,7 @@ function App() {
         <Route path="" element={<Login/>} />
         <Route path="login/:sth" element={<Login/>} />
         <Route path="register" element={<Register/>} />
-        <Route path="payment" element={<Payment/>} />
+        <Route path="cryptoPayment" element={<CryptoPayment/>} />
         <Route path="paymentFeedback" element={<PaymentFeedback/>} />
         <Route path="chat" element={<Chat/>} />
         <Route path="crypto" element={<Crypto/>} />

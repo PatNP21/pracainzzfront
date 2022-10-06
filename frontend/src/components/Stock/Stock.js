@@ -37,6 +37,16 @@ const Price = styled.div`
   box-shadow:0 0 3px gray;
   padding:0 2vw;
 `
+const ChartDiv = styled.div`
+  width:80vw;
+  max-width:1000px;
+  height:fit-content;
+  max-height:400px;
+  overflow:hidden;
+  margin:auto;
+  border-radius:10px;
+  box-shadow:0 0 3px gray;
+`
 
 function Stock() {
 
@@ -141,6 +151,9 @@ function Stock() {
               </tr>
             </table>
           </Price>
+          <ChartDiv>
+
+          </ChartDiv>
         </div>  
       }
     </div>

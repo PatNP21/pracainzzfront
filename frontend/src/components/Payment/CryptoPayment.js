@@ -1,5 +1,6 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import {useForm} from 'react-hook-form'
+import { useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 import Header from '../../elements/Header/Header'
 import StockCryptoHandler from '../../handlers/StockCryptoHandler'
@@ -31,17 +32,27 @@ const FormInput = styled.input`
     border:1px solid gray;
 `
 
-function Payment(props) {
+function CryptoPayment(props) {
 
     const stock_crypto_handler = new StockCryptoHandler()
 
     const {register, handleSubmit} = useForm()
+    const {state} = useLocation()
+    const {cryptocurrency, price} = state
 
     const [quantity, setQuantity] = useState(0)
     let totalPrice
 
+    useEffect(() => {
+        console.log(`state: ${cryptocurrency}, ${price}`)
+    })
+
     const onSubmit = (data) => {
-        console.log(data)
+        console.log({
+            element: props.cryptocurrency, 
+            quantity: quantity,
+            totalPrice: totalPrice
+        })
         stock_crypto_handler.paymentSession({
             element: props.cryptocurrency,
             quantity: quantity,
@@ -76,4 +87,4 @@ function Payment(props) {
     )
 }
 
-export default Payment
+export default CryptoPayment

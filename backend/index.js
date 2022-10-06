@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const pg = require('pg')
+const http = require('http')
 const {PrismaClient} = require('@prisma/client')
 const nodemailer = require('nodemailer')
 const bodyParser = require('body-parser')
@@ -13,6 +14,23 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 
+const server = http.createServer(app)
+const {Server} = require('socket.io')
+const io = new Server(server, {
+    cors: {
+        origin: 'http://localhost:3000/chat',
+        methods: ["GET", "POST"]
+    }
+})
+
+/*
+, {
+    cors: {
+        origin: 'http://localhost:3000/chat',
+        methods: ["GET", "POST"]
+    }
+}
+*/
 const prisma = new PrismaClient()
 
 const pg_client = new pg.Client("postgres://walotggl:SyCefhYZhqir55psmEC2bz3Zr-90b5YC@tyke.db.elephantsql.com/walotggl")
@@ -21,6 +39,20 @@ pg_client.connect((err) => {
     if (err) {
         console.log(err)
     }
+})
+
+//console.log(io)
+io.on('connection', (socket) => {
+    console.log(`user connected: ${socket.id}`)
+
+    socket.on('send_message', (data) => {
+        socket.broadcast.emit('receive_message', data)
+    })
+
+    
+})
+io.on('connect_error', (err) => {
+    console.log(err.message)
 })
 
 const transportMail = nodemailer.createTransport({
@@ -35,7 +67,7 @@ const stripe = new Stripe(process.env.SECRET_PAYMENT_KEY)
 
 stripe.customers.create({
     email: 'p.najda@hotmail.com'
-}).then(item => console.log(item))
+}).then(item => console.log(item.email))
 .catch(err => console.log(err))
 
 app.get('/', (req, res) => {
@@ -43,6 +75,10 @@ app.get('/', (req, res) => {
         res.json(data)
     })
 })
+
+app.get('/socket.io/socket.io.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/socket.io/client-dist/socket.io.js');
+  });
 
 app.get('/getUser/:id', async (req, res) => {
     const id = req.params.id
@@ -183,7 +219,7 @@ app.delete('/deletePost', async (req, res) => {
 app.get('/getAllPosts', async (req, res) => {
     await pg_client.query('SELECT * FROM posts')
     .then(data => {
-        console.log(data)
+        //console.log(data)
         res.status(200).json(data)
     }).catch(err => {
         console.log(err)
@@ -370,6 +406,6 @@ app.post('/createPaymentSession', async (req, res) => {
     }
 })
 
-app.listen(2023, () => {
+server.listen(2023, () => {
     console.log('App backend works!')
 })
