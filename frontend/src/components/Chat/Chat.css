@@ -1,0 +1,23 @@
+.messagePlot {
+    width:100%;
+    min-height:8vh;
+    height:fit-content;
+}
+
+.yourMessage {
+    width:100%;
+    height:fit-content;
+    background-color: #000080;
+    color:#ffffff;
+    border-radius: 8px;
+    margin-left:50%;
+    text-align: right;
+}
+
+.otherUserMessage {
+    width:100%;
+    height:fit-content;
+    background-color: #efefef;
+    border-radius: 8px;
+    margin-left:2%;
+}

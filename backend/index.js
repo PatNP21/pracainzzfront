@@ -43,7 +43,10 @@ pg_client.connect((err) => {
 
 //console.log(io)
 io.on('connection', (socket) => {
-    console.log(`user connected: ${socket.id}`)
+    socket.on('new-chat', (user) => {
+        console.log(`New active user: ${user}`)
+    })
+    //console.log(`user connected: ${socket.id}`)
 
     socket.on('send_message', (data) => {
         socket.broadcast.emit('receive_message', data)

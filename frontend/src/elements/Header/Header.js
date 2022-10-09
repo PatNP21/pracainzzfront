@@ -58,7 +58,7 @@ function Header() {
                 <FaUserFriends/>
             </Option>
             <Option onClick={() => {
-                navigate('/chat')
+                navigate('/chatList')
             }}>
                 <AiFillWechat/>
             </Option>

@@ -14,6 +14,7 @@ import Friends from './components/Friends/Friends';
 import Notifications from './components/Notifications/Notifications';
 import PaymentFeedback from './components/Payment/PaymentFeedback';
 import CryptoPayment from './components/Payment/CryptoPayment';
+import ChatList from './components/Chat/ChatList';
 
 function App() {
 
@@ -27,7 +28,8 @@ function App() {
         <Route path="register" element={<Register/>} />
         <Route path="cryptoPayment" element={<CryptoPayment/>} />
         <Route path="paymentFeedback" element={<PaymentFeedback/>} />
-        <Route path="chat" element={<Chat/>} />
+        <Route path="chatList" element={<ChatList/>}/>
+        <Route path="chat/:id" element={<Chat/>} />
         <Route path="crypto" element={<Crypto/>} />
         <Route path="dashboard" element={<Dashboard/>} />
         <Route path="news" element={<News/>} />
