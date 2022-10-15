@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { finnhubClient, FinnhubProvider } from 'react-finnhub'
 
 export default class StockCryptoHandler {
 
@@ -7,6 +8,9 @@ export default class StockCryptoHandler {
 
     //TwelveData APIkey
     api_key = 'b6b8fb83c2044518a6c60785a4e9f5fa'
+
+    //finnhub APIkey
+    client_stock = finnhubClient('cd5835aad3i7v64c6g9gcd5835aad3i7v64c6ga0')
 
     //data gotten from TwelveData API
     stocks = 'https://api.twelvedata.com/stocks'

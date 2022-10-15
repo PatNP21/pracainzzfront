@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react'
+import ProfileHandler from '../../handlers/ProfileHandler'
 import Header from '../../elements/Header/Header'
 import styled from 'styled-components'
 import {useForm} from 'react-hook-form'
+import {useParams} from 'react-router-dom'
 import {useCookies} from 'react-cookie'
 import {io} from 'socket.io-client'
 import './Chat.css'
@@ -77,15 +79,17 @@ const SubmitInput = styled.input`
 
 function Chat() {
 
+  const profile_handler = new ProfileHandler()
+
   const backendURL = 'http://localhost:2023'
-  const socket = io('http://localhost:2023') //connect(backendURL)
+  const socket = io(backendURL, { autoConnect: false }) //connect(backendURL)
 
   const [cookies] = useCookies()
+  const {userID} = useParams()
   const {register, handleSubmit} = useForm()
 
-  //const socketServer = io(backendURL)
-  const [message, setMessage] = useState()
-  const [gottenMessage, setGottenMessage] = useState()
+  const [converser, setConverser] = useState()
+  const [status, setStatus] = useState()
   let messagesList = []
 
   let text_input
@@ -95,9 +99,20 @@ function Chat() {
   let OtherUserMessageField
 
   useEffect(() => {
+    profile_handler.getUser(userID).then(res => {
+      setConverser(`${res.data.rows[0].firstname} ${res.data.rows[0].lastname}`)
+      socket.onAny((event, ...args) => {
+        console.log(event, args);
+      });
+      //socket.auth = converser
+      socket.connect()
+      console.log(converser)
+    }).catch(err => {
+      console.log(err)
+    })
+
     let count = 0
     let firstname, lastname
-
     if(count === 0 && firstname !== cookies.loginData[0].firstname && lastname !== cookies.loginData[0].lastname) {
       socket.emit('new-chat', `${cookies.loginData[0].firstname} ${cookies.loginData[0].lastname}`)
       firstname = cookies.loginData[0].firstname
@@ -116,16 +131,19 @@ function Chat() {
     MessagePlot = document.createElement('div')
     MessagePlot.setAttribute('class', 'messagePlot')
   }
-
+  let count = 0
   socket.on('receive_message', (data) => {
-    createElements()
-    if(data.author === `${cookies.loginData[0].firstname} ${cookies.loginData[0].lastname}`) {
-      MessagePlot.appendChild(YourMessage(data.content))
-    } else {
-      MessagePlot.appendChild(OtherUserMessage(data.content))
+    if(data.receiver === `${cookies.loginData[0].firstname} ${cookies.loginData[0].lastname}` || data.author === `${cookies.loginData[0].firstname} ${cookies.loginData[0].lastname}`) {
+      createElements()
+      if(data.author === `${cookies.loginData[0].firstname} ${cookies.loginData[0].lastname}`) {
+        MessagePlot.appendChild(YourMessage(data.content))
+      } else {
+        MessagePlot.appendChild(OtherUserMessage(data.content))
+      }
+      //messagesList.push(MessagePlot)
+      grid.appendChild(MessagePlot)
+      count = 0
     }
-    //messagesList.push(MessagePlot)
-    grid.appendChild(MessagePlot)
   })
 
 
@@ -155,11 +173,12 @@ function Chat() {
   }
 
   const sendMessage = (data) => {
-    data = {...data, author: `${cookies.loginData[0].firstname} ${cookies.loginData[0].lastname}`}
+    data = {...data, author: `${cookies.loginData[0].firstname} ${cookies.loginData[0].lastname}`, receiver: converser}
     createElements()
     try {
       socket.emit('send_message', data)
       text_input.value = ''
+      console.log('message sent')
     } catch(err) {
       console.log(err)
     }
@@ -177,7 +196,7 @@ function Chat() {
       <Container>
         <ConverserPanel>
           <Converser>
-            {`${cookies.loginData[0].firstname} ${cookies.loginData[0].lastname}`}
+            {converser}
           </Converser>
         </ConverserPanel>
         <Grid id="chatGrid">

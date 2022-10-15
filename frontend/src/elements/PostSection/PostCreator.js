@@ -50,6 +50,9 @@ function PostCreator(props) {
     console.log(postData)
     post_handler.writePost(postData).then(res => {
       console.log(res)
+    }).catch(err => {
+      console.log(err)
+      alert('error')
     })
   }
 

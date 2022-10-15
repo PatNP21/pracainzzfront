@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Header from '../../elements/Header/Header'
 import StockCryptoHandler from '../../handlers/StockCryptoHandler'
 import {Circles} from 'react-loader-spinner'
+import { FinnhubProvider, useFinnhub } from 'react-finnhub'
 import styled from 'styled-components'
 
 const MenuContainer = styled.div`
@@ -54,6 +55,8 @@ function Stock() {
 
   const navigate = useNavigate()
 
+  const finnhub = useFinnhub()
+
   const [loaded, updateLoaded] = useState(false)
   const [stockList, setStockList] = useState([])
   const [stockData, setStockData] = useState()
@@ -63,6 +66,7 @@ function Stock() {
 
 
   useEffect(() => {
+    console.log(finnhub.companyNews())
     
     operateHandler.getStocks().then(res => {
       updateLoaded(true)
@@ -81,18 +85,23 @@ function Stock() {
 
   const getAPI = (stock) => {
     console.log(stock)
-    operateHandler.getAPI(stock).then(res => {
+    finnhub.companyBasicFinancials(stock, 'all').then(res => {
+      console.log(res)
+    }).catch(err => {
+      console.log(`coś poszło nie tak: ${err}`)
+    })
+    /*operateHandler.getAPI(stock).then(res => {
       console.log(res)
       setStockData(res.data.values)
       console.log(`stock: ${stock}`)
       return stock
     }).catch(err => {
       console.log(err)
-    })
+    })*/
   }
 
   return (
-    <div>
+    <>
       <Header/>
       {!loaded ? 
         <Circles color="#00BFFF" height={80} width={80}/> : 
@@ -156,7 +165,7 @@ function Stock() {
           </ChartDiv>
         </div>  
       }
-    </div>
+    </>
   )
 }
 

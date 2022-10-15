@@ -27,7 +27,6 @@ function PostList(props) {
             post_id={item.post_id}
             author={item.authorid}
             creatingDate={item.creating_date}
-            multimedia={item.multimedia}
             content={item.content}
           />
         })}

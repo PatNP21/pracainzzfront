@@ -45,6 +45,7 @@ pg_client.connect((err) => {
 io.on('connection', (socket) => {
     socket.on('new-chat', (user) => {
         console.log(`New active user: ${user}`)
+        socket.emit('is-active', 'yes')
     })
     //console.log(`user connected: ${socket.id}`)
 
@@ -212,11 +213,11 @@ app.get('/getAuthor/:id', async (req, res) => {
 })
 
 app.put('/editPost', async (req, res) => {
-
+    //await pg_client.query('UPDATE posts SET content = $1 WHERE ')
 })
 
 app.delete('/deletePost', async (req, res) => {
-
+    //await pg_client.query('DELETE FROM posts WHERE')
 })
 
 app.get('/getAllPosts', async (req, res) => {
@@ -258,11 +259,11 @@ app.post('/addComment', async (req, res) => {
 })
 
 app.put('/editComment', async (req, res) => {
-
+    //
 })
 
 app.delete('/deleteComment', async (req, res) => {
-
+    //
 })
 
 app.get('/getComments', async (req, res) => {
