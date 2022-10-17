@@ -58,7 +58,7 @@ function PostCreator(props) {
 
   return (
     <Container>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} enctype="multipart/form-data">
         <Textarea placeholder='Write your post' {...register('content')}/>
         <Attachment>
           <label htmlFor="attachmentInput">

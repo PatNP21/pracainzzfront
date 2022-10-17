@@ -9,6 +9,7 @@ import Widget from '../../elements/Widgets/Widget'
 import {useCookies} from 'react-cookie'
 import PostHandler from '../../handlers/PostHandler'
 import StockCryptoHandler from '../../handlers/StockCryptoHandler'
+import News from '../News/News'
 
 const LeftNav = styled.div`
   width:25vw;
@@ -78,7 +79,12 @@ function Dashboard() {
           <Widget/>
         </Btn>
 
-        <NewsWidget/>
+        <Btn onClick={() => {
+            navigate('/newsList')
+          }}>
+            <NewsWidget/>
+        </Btn>
+        
       </LeftNav>
       {posts && <PostPanel posts={posts}/>}
       <RightNav>

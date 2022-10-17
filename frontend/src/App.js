@@ -18,6 +18,7 @@ import ChatList from './components/Chat/ChatList';
 import Wallet from './components/Wallet/Wallet';
 import { FinnhubProvider } from 'react-finnhub'
 import StockCryptoHandler from './handlers/StockCryptoHandler'
+import ExtendedNewsInfo from './components/News/ExtendedNewsInfo';
 
 function App() {
   const operateHandler = new StockCryptoHandler()
@@ -38,7 +39,8 @@ function App() {
           </Route>
           <Route path="crypto" element={<Crypto/>} />
           <Route path="dashboard" element={<Dashboard/>} />
-          <Route path="news" element={<News/>} />
+          <Route path="newsList" element={<News/>} />
+          <Route path="news/:id" element={<ExtendedNewsInfo/>}/>
           <Route path="profile" element={<Profile/>}>
             <Route path=":userID" element={<Profile/>}/>
           </Route>

@@ -2,8 +2,11 @@ import React, {useState, useEffect} from 'react'
 import styled from 'styled-components'
 import CommentSection from '../CommentSection/CommentSection'
 import { useCookies } from 'react-cookie'
+import { useNavigate } from 'react-router-dom'
 import avatar from './../../avatar.png'
 import PostHandler from '../../handlers/PostHandler'
+import {HiTrash} from 'react-icons/hi'
+import {AiFillEdit} from 'react-icons/ai'
 
 const Container = styled.div`
     width:40vw;
@@ -36,12 +39,37 @@ const Image = styled.img`
 const Content = styled.p`
     justify-content:center;
 `
+const PostOptions = styled.div`
+    display:inline-block;
+    margin-left:20vw;
+`
+const DonateButton = styled.button`
+    width:fit-content;
+    height:fit-content;
+    margin-left:20vw;
+    display:inline-block;
+    border:none;
+    border-radius:8px;
+    padding:10px;
+`
+const PostOption = styled.button`
+    width:fit-content;
+    height:fit-content;
+    float:left;
+    margin:0 1vw;
+    font-size:20px;
+    cursor:pointer;
+    background-color:#fff;
+    border:none;
+`
 
 function PostItem(props) {
 
     const post_handler = new PostHandler()
 
     const [cookies] = useCookies()
+
+    const navigate = useNavigate()
 
     const [loadedState, setLoadedState] = useState(false)
 
@@ -61,12 +89,35 @@ function PostItem(props) {
         console.log(fromBuffer)
     }, [])
 
+    const deletePost = () => {
+        
+    }
+
+    const editPost = () => {
+
+    }
+
   return (
     <div>
         {loadedState && <Container>
             <Avatar src={avatar}/>
             <AuthorHeader>{author}</AuthorHeader>
-            {props.author !== cookies.loginData[0].id && <button>Donate</button>}
+            {props.author !== cookies.loginData[0].id ? 
+                <DonateButton onClick={() => {
+                    navigate('/myWallet/1')
+                }}>
+                    Donate
+                </DonateButton> : 
+                <PostOptions>
+                    <PostOption>
+                        <HiTrash className='fa fa-2x'/>
+                    </PostOption>
+
+                    <PostOption>
+                        <AiFillEdit/>
+                    </PostOption>
+                </PostOptions>
+            }
             <CreatingDate>{props.creatingDate}</CreatingDate>
             <Content>
                 <img src={`${props.multimedia}:image/png;base64,${fromBuffer}`}/>

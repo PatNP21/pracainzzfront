@@ -216,8 +216,15 @@ app.put('/editPost', async (req, res) => {
     //await pg_client.query('UPDATE posts SET content = $1 WHERE ')
 })
 
-app.delete('/deletePost', async (req, res) => {
-    //await pg_client.query('DELETE FROM posts WHERE')
+app.post('/deletePost/:id', async (req, res) => {
+    const id = req.params.id
+    await pg_client.query('DELETE FROM posts WHERE post_id = $1', [id])
+    .then(data => {
+        res.status(200).json(data)
+    }).catch(err => {
+        console.log(err)
+        res.status(500).json(err)
+    })
 })
 
 app.get('/getAllPosts', async (req, res) => {
