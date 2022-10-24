@@ -7,6 +7,7 @@ import NewsWidget from '../../elements/Widgets/NewsWidget'
 import ProfileWidget from '../../elements/Widgets/ProfileWidget'
 import Widget from '../../elements/Widgets/Widget'
 import {useCookies} from 'react-cookie'
+import {useFinnhub} from 'react-finnhub'
 import PostHandler from '../../handlers/PostHandler'
 import StockCryptoHandler from '../../handlers/StockCryptoHandler'
 import News from '../News/News'
@@ -29,6 +30,21 @@ const Btn = styled.div`
   border-radius: 10px;
   margin:2vh auto;
 `
+//headertoWidgets
+const WidgetHeader = styled.div`
+  width:100%;
+  height:7px;
+  padding:2px 0;
+  text-align:center;
+  font-size:0.8em;
+`
+
+//imageToNewsWidget
+const Image = styled.img`
+  width:100%;
+  height:14vh;
+`
+
 
 function Dashboard() {
 
@@ -36,6 +52,8 @@ function Dashboard() {
   const post_handler = new PostHandler()
   const stock_crypto_handler = new StockCryptoHandler()
   const [cookies, setCookie] = useCookies()
+  const finnhub = useFinnhub()
+  const [newsWidgetItem, setNewsWidgetItem] = useState()
 
   //posts
   const [posts, getPosts] = useState()
@@ -47,6 +65,15 @@ function Dashboard() {
       getPosts(res.data.rows)
     })
 
+    finnhub.marketNews('general').then(res => {
+      //res.data - Array
+      console.log(res.data)
+      setNewsWidgetItem(res.data[Math.floor(Math.random()*(res.data.length))-1])
+      console.log(newsWidgetItem)
+    }).catch(err => {
+      console.log(err)
+    })
+
     /*stock_crypto_handler.getStocks().then(res => {
       console.log(res.data.data)
     })
@@ -55,34 +82,53 @@ function Dashboard() {
       console.log(res.data.data)
     })*/
 
-  })
+  }, [])
 
   return (
     <div>
       <Header/>
       <LeftNav>
         <Btn onClick={() => {
-            navigate(`/profile/${cookies.loginData[0].id}`)
+            navigate(`/profile/${cookies.loginData.data.user[0].id}`)
         }}>
-          <ProfileWidget firstname={cookies.loginData[0].firstname}/>
+          <ProfileWidget firstname={cookies.loginData.data.user[0].firstname}/>
         </Btn>
 
         <Btn onClick={() => {
             navigate('/stock')
           }}>
-          <Widget/>
+          <Widget>
+            <WidgetHeader>
+              Stock
+            </WidgetHeader>
+          </Widget>
         </Btn>
 
         <Btn onClick={() => {
             navigate('/crypto')
           }}>
-          <Widget/>
+          <Widget>
+            <WidgetHeader>
+              Crypto
+            </WidgetHeader>
+          </Widget>
         </Btn>
 
         <Btn onClick={() => {
             navigate('/newsList')
           }}>
-            <NewsWidget/>
+            <NewsWidget>
+              {newsWidgetItem !== undefined ? 
+                <div>
+                  <p>
+                    {newsWidgetItem.headline}
+                  </p>
+                  <Image src={newsWidgetItem.image}/>
+                </div>
+                   : 
+                "NewsWidget"
+              }
+            </NewsWidget>
         </Btn>
         
       </LeftNav>

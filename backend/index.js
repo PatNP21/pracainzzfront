@@ -5,14 +5,27 @@ const http = require('http')
 const {PrismaClient} = require('@prisma/client')
 const nodemailer = require('nodemailer')
 const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
+const redis = require('redis')
 const JWT = require('jsonwebtoken')
+const JWT_redis = require('jwt-redis').default
 const crypto = require('crypto')
-const {Stripe} = require('stripe')
+const Stripe = require('stripe')(process.env.SECRET_PAYMENT_KEY)
 require('dotenv').config()
 
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
+app.use(cookieParser())
+
+
+//const redisclient = redis.createClient()
+/*redisclient.connect({ url: 'redis://redis:6379' }).then(res => {
+    console.log('redisclient is connnected')
+}).catch(err => {
+    console.log(err)
+})
+const jwtrClient = new JWT_redis(redisclient)*/
 
 const server = http.createServer(app)
 const {Server} = require('socket.io')
@@ -67,12 +80,12 @@ const transportMail = nodemailer.createTransport({
     }
 })
 
-const stripe = new Stripe(process.env.SECRET_PAYMENT_KEY)
+//const stripe = new Stripe(process.env.SECRET_PAYMENT_KEY)
 
-stripe.customers.create({
+Stripe.customers.create({
     email: 'p.najda@hotmail.com'
-}).then(item => console.log(item.email))
-.catch(err => console.log(err))
+})//.then(item => console.log(item.email))
+//.catch(err => console.log(err))
 
 app.get('/', (req, res) => {
     pg_client.query('SELECT * FROM users').then((data) => {
@@ -120,13 +133,20 @@ app.post('/login', async (req, res) => {
     const {user, password} = req.body
     await pg_client.query('SELECT * FROM users WHERE email = $1 and password = $2', [req.body.user, req.body.password])
     .then((data) => {
+        let cookie
         console.log(user, password)
         console.log(data.rows)
         const token = JWT.sign({id: data.rows.id, user: req.body.user}, 'elelelele')
+        /*cookie = res.cookie('logData', {
+            user: data.rows,
+            token: token
+        }, {expiresIn: '1h'})*/
+        //console.log(cookie)
         res.status(200).json({
             user: data.rows,
             token: token
         })
+        res.send(cookie)
     }).catch(err => {
         //console.log(user, password)
         console.log(err)
@@ -134,8 +154,22 @@ app.post('/login', async (req, res) => {
     })
 })
 
-app.get('/logout', async (req, res) => {
+app.get('/getCookie', async (req, res) => {
+    res.send(req.cookies)
+})
 
+app.get('/logout', async (req, res) => {
+    const {token} = req.body
+
+    /*try {
+        jwtrClient.destroy(token)
+        console.log('logout!')
+        res.status(200).json('User is logged out!')
+    } catch(err) {
+        console.log(err)
+        res.status(500).json(err)
+    }*/
+    
 })
 
 app.post('/getEmail', async (req, res) => {
@@ -216,7 +250,7 @@ app.put('/editPost', async (req, res) => {
     //await pg_client.query('UPDATE posts SET content = $1 WHERE ')
 })
 
-app.post('/deletePost/:id', async (req, res) => {
+app.delete('/deletePost/:id', async (req, res) => {
     const id = req.params.id
     await pg_client.query('DELETE FROM posts WHERE post_id = $1', [id])
     .then(data => {
@@ -395,20 +429,20 @@ app.get('/getNotifications', async (req, res) => {
 
 //PAYMENTS
 app.post('/createPaymentSession', async (req, res) => {
-    const {element, quantity, totalPrice} = req.body
+    const {element, quantity, totalPrice, price_data} = req.body
     try {
-        const session = await stripe.checkout.sessions.create({
+        const session = await Stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             mode: 'payment',
             line_items: [
                 {
-                    element: element,
+                    price_data: price_data,
                     quantity: quantity,
-                    totalPrice: totalPrice
+                    price: totalPrice
                 }
             ],
-            success_url: 'http://localhost:3000/dashboard',
-            cancel_url: 'http://localhost:3000/payment'
+            success_url: 'http://localhost:3000/paymentSuccess',
+            cancel_url: 'http://localhost:3000/paymentFailure'
         })
         res.status(200).json({message:'success'})
     } catch(err) {

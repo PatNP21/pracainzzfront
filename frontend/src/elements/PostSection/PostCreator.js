@@ -1,8 +1,22 @@
-import React from 'react'
+import React, {useState} from 'react'
 import styled from 'styled-components'
 import {useForm} from 'react-hook-form'
 import {IoMdAttach} from 'react-icons/io'
 import PostHandler from '../../handlers/PostHandler'
+import { useCookies } from 'react-cookie'
+import { Modal, Typography, Box } from '@mui/material';
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};
 
 const Container = styled.div`
     width:42vw;
@@ -41,18 +55,23 @@ const SubmitBtn = styled.button`
 function PostCreator(props) {
 
   const {register, handleSubmit} = useForm()
+  const [cookies] = useCookies()
   const post_handler = new PostHandler()
+
+  const [openSuccessModal, setOpenSuccessModal] = useState(false)
+  const [openFailureModal, setOpenFailureModal] = useState(false)
 
   const onSubmit = (data) => {
     let postData
     console.log(data)
-    postData = {...data, authorId: props.authorid}
+    postData = {...data, authorId: cookies.loginData[0].id}
     console.log(postData)
     post_handler.writePost(postData).then(res => {
       console.log(res)
+      setOpenSuccessModal(true)
     }).catch(err => {
       console.log(err)
-      alert('error')
+      setOpenFailureModal(true)
     })
   }
 
@@ -75,6 +94,27 @@ function PostCreator(props) {
         </Attachment>
         <SubmitBtn>Add</SubmitBtn>
       </form>
+      <Modal
+          open={openSuccessModal}
+          onClose={() => setOpenSuccessModal(false)}
+      >
+          <Box style={style}>
+              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                  Adding finished successfully.
+              </Typography>
+          </Box>
+      </Modal>
+
+      <Modal
+          open={openFailureModal}
+          onClose={() => setOpenFailureModal(false)}
+      >
+          <Box style={style}>
+              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                  Cannot add new post.
+              </Typography>
+          </Box>
+      </Modal>
     </Container>
   )
 }

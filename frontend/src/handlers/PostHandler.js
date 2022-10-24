@@ -16,8 +16,8 @@ export default class PostHandler {
         return axios.post(`${this.baseURL}/writePost`, data)
     }
 
-    deletePost(data, id) {
-        return axios.post(`${this.baseURL}/deletePost/${id}`, data)
+    deletePost(id) {
+        return axios.delete(`${this.baseURL}/deletePost/${id}`)
     }
 
     getAuthorById(id) {

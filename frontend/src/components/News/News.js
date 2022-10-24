@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import Header from '../../elements/Header/Header'
 import styled from 'styled-components'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import {useFinnhub} from 'react-finnhub'
 import NewsItem from './NewsItem'
 
@@ -36,14 +36,13 @@ function News() {
 
   const [newsList, setNewsList] = useState()
   const navigate = useNavigate()
+  const {state} = useLocation()
   const finnhub = useFinnhub()
 
   useEffect(() => {
     finnhub.marketNews('general').then(res => {
       console.log(res)
-      setNewsList(res.data.filter(item => {
-        return item.category === 'business'
-      }))
+      setNewsList(res.data)
       console.log(newsList)
     }).catch(err => {
       console.log(err)
@@ -58,7 +57,7 @@ function News() {
           return (
             <ItemBtn onClick={() => {
               console.log(`newsItem selected!`)
-              navigate(`/news/${Number(newsList.indexOf(item)+1)}`)
+              navigate(`/news/${Number(newsList.indexOf(item)+1)}`, {state: item})
             }}>
               <NewsItem data={item}/>
             </ItemBtn>

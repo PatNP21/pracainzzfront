@@ -7,6 +7,7 @@ import avatar from './../../avatar.png'
 import PostHandler from '../../handlers/PostHandler'
 import {HiTrash} from 'react-icons/hi'
 import {AiFillEdit} from 'react-icons/ai'
+import { Modal, Typography, Box } from '@mui/material';
 
 const Container = styled.div`
     width:40vw;
@@ -63,6 +64,18 @@ const PostOption = styled.button`
     border:none;
 `
 
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
+
 function PostItem(props) {
 
     const post_handler = new PostHandler()
@@ -74,6 +87,8 @@ function PostItem(props) {
     const [loadedState, setLoadedState] = useState(false)
 
     const [author, setAuthor] = useState()
+    const [openSuccessModal, setOpenSuccessModal] = useState(false)
+    const [openFailureModal, setOpenFailureModal] = useState(false)
 
     let fromBuffer
 
@@ -89,8 +104,12 @@ function PostItem(props) {
         console.log(fromBuffer)
     }, [])
 
-    const deletePost = () => {
-        
+    const deletePost = (id) => {
+        post_handler.deletePost(id).then(res => {
+            setOpenSuccessModal(true)
+        }).catch(err => {
+            setOpenFailureModal(true)
+        })
     }
 
     const editPost = () => {
@@ -102,14 +121,14 @@ function PostItem(props) {
         {loadedState && <Container>
             <Avatar src={avatar}/>
             <AuthorHeader>{author}</AuthorHeader>
-            {props.author !== cookies.loginData[0].id ? 
+            {props.author !== cookies.loginData.data.user[0].id ? 
                 <DonateButton onClick={() => {
                     navigate('/myWallet/1')
                 }}>
                     Donate
                 </DonateButton> : 
                 <PostOptions>
-                    <PostOption>
+                    <PostOption onClick={deletePost(props.post_id)}>
                         <HiTrash className='fa fa-2x'/>
                     </PostOption>
 
@@ -125,6 +144,16 @@ function PostItem(props) {
             </Content>
             <CommentSection post_id={props.post_id}/>
         </Container>}
+        {/*<Modal
+            open={openSuccessModal}
+            onClose={() => setOpenSuccessModal(false)}
+        >
+            <Box style={style}>
+                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    XD
+                </Typography>
+            </Box>
+        </Modal>*/}
     </div>
   )
 }

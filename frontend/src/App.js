@@ -19,6 +19,8 @@ import Wallet from './components/Wallet/Wallet';
 import { FinnhubProvider } from 'react-finnhub'
 import StockCryptoHandler from './handlers/StockCryptoHandler'
 import ExtendedNewsInfo from './components/News/ExtendedNewsInfo';
+import Success from './components/PaymentStatus/Success';
+import Failure from './components/PaymentStatus/Failure';
 
 function App() {
   const operateHandler = new StockCryptoHandler()
@@ -52,6 +54,8 @@ function App() {
           <Route path="myWallet/:code" element={<Wallet/>}>
 
           </Route>
+          <Route path="paymentSuccess" element={<Success/>}/>
+          <Route path="paymentFailure" element={<Failure/>}/>
         </Routes>
       </Router>
     </FinnhubProvider>

@@ -5,7 +5,7 @@ import { useCookies } from 'react-cookie';
 import styled from 'styled-components'
 import AccountHandler from '../../handlers/AccountHandler'
 import LoadingModal from '../../modals/LoadingModal';
-import Modal from 'react-modal'
+import { Modal, Typography, Box, Button } from '@mui/material';
 
 const Container = styled.div`
     width:fit-content;
@@ -37,6 +37,17 @@ const SubmitBtn = styled.input`
     border-radius:10px;
     cursor:pointer;
 `
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 'fit-content',
+    bgcolor: 'white',
+    borderRadius: '10px',
+    boxShadow: '0 0 3px gray',
+    p: 2,
+};
 
 function Login() {
 
@@ -45,6 +56,8 @@ function Login() {
     const navigate = useNavigate()
     const [cookies, setCookie] = useCookies()
     const [waitingForResponseModal, setWaitingForResponseModal] = useState(false)
+    const [openSuccessModal, setOpenSuccessModal] = useState(false)
+    const [openFailureModal, setOpenFailureModal] = useState(false)
 
     const account_handler = new AccountHandler()
 
@@ -54,11 +67,12 @@ function Login() {
         account_handler.logToService(data).then(res => {
             setWaitingForResponseModal(false)
             console.log(res)
-            setCookie('loginData', res.data.user)
+            setCookie('loginData', res, {SameSite: 'none'})
             navigate('/dashboard')
         }).catch(err => {
             setWaitingForResponseModal(false)
             console.log(err)
+            setOpenFailureModal(true)
             alert('User not found')
         })
     }
@@ -78,10 +92,20 @@ function Login() {
                     <SubmitBtn type="submit" value="Sign in"/>
                 </form>
             </Container>
-            {waitingForResponseModal && 
+            {/*waitingForResponseModal && 
                 <Modal>
                 </Modal>
-            }
+            */}
+            <Modal
+                open={openFailureModal}
+                onClose={() => setOpenFailureModal(false)}
+            >
+                <Box style={style}>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        User not found. Make sure you entered proper data!
+                    </Typography>
+                </Box>
+            </Modal>
         </>
     )
 }

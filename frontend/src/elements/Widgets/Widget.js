@@ -9,9 +9,11 @@ const Container = styled.div`
     border-radius:10px;
 `
 
-function Widget() {
+function Widget(props) {
   return (
-    <Container>Widget</Container>
+    <Container>
+      {props.children}
+    </Container>
   )
 }
 

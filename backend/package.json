@@ -13,6 +13,7 @@
     "@prisma/client": "^4.2.1",
     "bcrypt": "^5.0.1",
     "body-parser": "^1.20.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.0.2",
@@ -23,6 +24,8 @@
     "nodemon": "^2.0.19",
     "pg": "^8.8.0",
     "prisma": "^4.2.1",
+    "redis": "^4.3.1",
+    "redis-server": "^1.2.2",
     "socket.io": "^4.5.2",
     "stripe": "^10.12.0"
   }

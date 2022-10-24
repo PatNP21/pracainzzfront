@@ -4,6 +4,7 @@ import Header from '../../elements/Header/Header'
 import StockCryptoHandler from '../../handlers/StockCryptoHandler'
 import {Circles} from 'react-loader-spinner'
 import { FinnhubProvider, useFinnhub } from 'react-finnhub'
+import Chart from './../../elements/Chart'
 import styled from 'styled-components'
 
 const MenuContainer = styled.div`
@@ -59,14 +60,14 @@ function Stock() {
 
   const [loaded, updateLoaded] = useState(false)
   const [stockList, setStockList] = useState([])
-  const [stockData, setStockData] = useState()
+  let stockData
+  const [showChart, updateShowChart] = useState(false)
 
   let stock
   //const [stock, selectStock] = useState('')
 
 
   useEffect(() => {
-    console.log(finnhub.companyNews())
     
     operateHandler.getStocks().then(res => {
       updateLoaded(true)
@@ -81,12 +82,18 @@ function Stock() {
       setStockList(properList.slice(0, 99))
       console.log(stockList)
     })
-  })
+  }, [])
 
   const getAPI = (stock) => {
     console.log(stock)
     finnhub.companyBasicFinancials(stock, 'all').then(res => {
       console.log(res)
+      stockData = res.data
+      console.log(stockData)
+
+      if(stockData) {
+        updateShowChart(true)
+      }
     }).catch(err => {
       console.log(`coś poszło nie tak: ${err}`)
     })
@@ -142,26 +149,22 @@ function Stock() {
             <table>
               <tr>
                 <th>symbol</th>
-                <th>open</th>
                 <th>low</th>
                 <th>high</th>
-                <th>close</th>
                 <th>volume</th>
                 <th>last transaction</th>
               </tr>
               <tr>
-                <td>{getAPI(stock)}</td>
-                <td>{stockData && stockData[0].open}$</td>
-                <td>{stockData && stockData[0].low}$</td>
-                <td>{stockData && stockData[0].high}$</td>
-                <td>{stockData && stockData[0].close}$</td>
-                <td>{stockData && stockData[0].volume}</td>
-                <td>{stockData && stockData[0].datetime}</td>
+                <td>{stockData && stockData.symbol}</td>
+                <td>{stockData && stockData.metric['52WeekLow']}$</td>
+                <td>{stockData && stockData.metric['52WeekHigh']}$</td>
+                <td></td>
+                <td></td>
               </tr>
             </table>
           </Price>
-          <ChartDiv>
-
+          <ChartDiv> 
+            {showChart && stockData ? <Chart data={stockData}/> : <p>NONE</p>}
           </ChartDiv>
         </div>  
       }

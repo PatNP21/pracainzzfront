@@ -14,6 +14,12 @@ const Group = styled.div`
   height:70vh;
   border-radius:10px;
   box-shadow:0 0 3px #000080;
+  overflow:hidden;
+`
+const TitleHeader = styled.div`
+  width:100%;
+  height:6vh;
+  text-align:center;
 `
 const Button = styled.button`
   border:none;
@@ -29,12 +35,18 @@ function Wallet() {
       <Header/>
       <Container>
         <Group>
+          <TitleHeader>
+            Stock
+          </TitleHeader>
           <Button>
             Sell
           </Button>
         </Group>
 
         <Group>
+          <TitleHeader>
+            Crypto
+          </TitleHeader>
           <Button>
             Sell
           </Button>
