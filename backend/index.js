@@ -10,14 +10,13 @@ const redis = require('redis')
 const JWT = require('jsonwebtoken')
 const JWT_redis = require('jwt-redis').default
 const crypto = require('crypto')
-const Stripe = require('stripe')(process.env.SECRET_PAYMENT_KEY)
+const stripe = require('stripe')('sk_test_51LnUboDIfBxVZtZzXpHT2Bqu24JfNb0t3lW3clIBSin5sIBN5gCGHqZNpE6PqnpyfC8GBE4rnhqsUiAcouktxv7j00wzxPpnQu')
 require('dotenv').config()
 
 const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 app.use(cookieParser())
-
 
 //const redisclient = redis.createClient()
 /*redisclient.connect({ url: 'redis://redis:6379' }).then(res => {
@@ -82,11 +81,11 @@ const transportMail = nodemailer.createTransport({
 
 //const stripe = new Stripe(process.env.SECRET_PAYMENT_KEY)
 
-Stripe.customers.create({
+/*Stripe.customers.create({
     email: 'p.najda@hotmail.com'
 })//.then(item => console.log(item.email))
 //.catch(err => console.log(err))
-
+*/
 app.get('/', (req, res) => {
     pg_client.query('SELECT * FROM users').then((data) => {
         res.json(data)
@@ -122,6 +121,10 @@ app.post('/registerClient', async (req, res) => {
             html: `
                 Welcome! Link to activate your account: <a>http://localhost:3000/login/${linkCipher}</a>
             `
+        })
+        stripe.customers.create({
+            id: id,
+            email: email
         })
     }).catch(err => {
         console.log(err)
@@ -429,21 +432,56 @@ app.get('/getNotifications', async (req, res) => {
 
 //PAYMENTS
 app.post('/createPaymentSession', async (req, res) => {
-    const {element, quantity, totalPrice, price_data} = req.body
+    const {userid, email, quantity, totalPrice, cardNumber, cardExpDate, cardCVV} = req.body
+    console.log(req.body)
+    console.log(`email before trying to create a client: ${email}`)
     try {
-        const session = await Stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            mode: 'payment',
-            line_items: [
-                {
-                    price_data: price_data,
-                    quantity: quantity,
-                    price: totalPrice
-                }
-            ],
-            success_url: 'http://localhost:3000/paymentSuccess',
-            cancel_url: 'http://localhost:3000/paymentFailure'
+        /*await stripe.customers.create({
+            id: userid,
+            email: email
+        }).then(data => {
+            console.log(`email after trying to create a client: ${email}`)
+            console.log(data)
+        }).catch(err => {
+            console.log(err)
+        })*/
+
+        const cardCredentials = await stripe.tokens.create({
+            card: {
+                number: cardNumber,
+                exp_month: cardExpDate.substring(0, cardExpDate.indexOf('/')),
+                exp_year: cardExpDate.substring(cardExpDate.indexOf('/')+1, cardExpDate.length),
+                cvc: cardCVV
+            }
         })
+
+        console.log(cardCredentials)
+
+        const card = await stripe.customers.createSource(String(userid), {
+            source: cardCredentials.id
+        })
+
+        console.log(card)
+
+        await stripe.charges.create({
+            receipt_email: email,
+            amount: quantity,
+            currency: 'usd',
+            card: card.id,
+            customer: String(userid)
+        }).then(data => {
+            console.log(data)
+        }).catch(err => {
+            console.log(err)
+        })
+
+        /*const session = await Stripe.paymentIntents.create({
+            amount: Number(quantity),
+            currency: "usd",
+            automatic_payment_methods: {
+                enabled: true,
+            },
+        })*/
         res.status(200).json({message:'success'})
     } catch(err) {
         console.log(err)

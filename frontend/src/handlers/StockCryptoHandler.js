@@ -36,7 +36,7 @@ export default class StockCryptoHandler {
         return axios.get(this.cryptocurrencies)
     }
 
-    paymentSession() {
-        return axios.post(`${this.baseURL}/createPaymentSession`)
+    paymentSession(data) {
+        return axios.post(`${this.baseURL}/createPaymentSession`, data)
     }
 }

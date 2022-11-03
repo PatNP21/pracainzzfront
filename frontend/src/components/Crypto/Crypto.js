@@ -63,6 +63,7 @@ function Crypto() {
   const [showChart, updateShowChart] = useState(false)
   const [cryptoList, setCryptoList] = useState([])
   const [cryptoData, setCryptoData] = useState()
+  const [cryptoToBuy, setCryptoToBuy] = useState()
 
   let crypto
   let interval
@@ -112,6 +113,7 @@ function Crypto() {
                   crypto = e.target.value
                   console.log(crypto)
                   getAPI(crypto, interval)
+                  setCryptoToBuy(crypto)
                 }}
               >
                 {cryptoList && cryptoList.map(item => {
@@ -147,7 +149,7 @@ function Crypto() {
 
           <BtnsSection>
             <OptionButton onClick={() => {
-                navigate('/cryptoPayment', {state: {cryptocurrency: crypto, price: cryptoData[cryptoData.length-1].open}})
+                navigate('/cryptoPayment', {state: {cryptocurrency: cryptoToBuy, price: cryptoData[0].open}})
             }}>
               Buy Crypto
             </OptionButton>

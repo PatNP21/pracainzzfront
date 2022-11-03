@@ -1,5 +1,8 @@
 import React, {useState, useEffect} from 'react'
+import { loadStripe, PaymentIntent } from "@stripe/stripe-js"
+import { Elements, PaymentElement } from "@stripe/react-stripe-js"
 import {useForm} from 'react-hook-form'
+import {useCookies} from 'react-cookie'
 import { useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 import Header from '../../elements/Header/Header'
@@ -35,28 +38,48 @@ const FormInput = styled.input`
 function CryptoPayment(props) {
 
     const stock_crypto_handler = new StockCryptoHandler()
+    //const secrets = new Secrets()
+
+    const stripeKey = loadStripe("pk_test_51LnUboDIfBxVZtZzbP6OX1I4rJBANa79eenkO9fHUXg0xuiAFCTCuLCkv6KwuS3JChMmMM9YsIZlA0rqD1bfGQ6u00Sso7PUXB")
+    const stripeClientServer = 'sk_test_51LnUboDIfBxVZtZzXpHT2Bqu24JfNb0t3lW3clIBSin5sIBN5gCGHqZNpE6PqnpyfC8GBE4rnhqsUiAcouktxv7j00wzxPpnQu'
 
     const {register, handleSubmit} = useForm()
+    const [cookies] = useCookies()
     const {state} = useLocation()
-    const {cryptocurrency, price} = state
+    //const {cryptocurrency, price} = state
+    const [clientCipher, setClientCipher] = useState(false)
 
     const [quantity, setQuantity] = useState(0)
-    let totalPrice
+    const [totalPrice, setTotalPrice] = useState(0)
+
+    const options = {
+        clientSecret: 'sk_test_51LnUboDIfBxVZtZzXpHT2Bqu24JfNb0t3lW3clIBSin5sIBN5gCGHqZNpE6PqnpyfC8GBE4rnhqsUiAcouktxv7j00wzxPpnQu'
+    }
 
     useEffect(() => {
-        console.log(`state: ${cryptocurrency}, ${price}`)
+        console.log(`state: ${state.cryptocurrency}, ${state.price}`)
     })
 
     const onSubmit = (data) => {
         console.log({
-            element: props.cryptocurrency, 
+            //element: props.cryptocurrency, 
+            userid: cookies.loginData.data.user[0].id,
+            email: cookies.loginData.data.user[0].email,
             quantity: quantity,
-            totalPrice: totalPrice
+            totalPrice: totalPrice,
+            cardNumber: data.cardNumber,
+            cardExpDate: data.cardExpDate,
+            cardCVV: data.cardCVV
         })
         stock_crypto_handler.paymentSession({
-            element: props.cryptocurrency,
+            //element: props.cryptocurrency,
+            userid: cookies.loginData.data.user[0].id,
+            email: cookies.loginData.data.user[0].email,
             quantity: quantity,
-            totalPrice: totalPrice
+            totalPrice: totalPrice,
+            cardNumber: data.cardNumber,
+            cardExpDate: data.cardExpDate,
+            cardCVV: data.cardCVV
         }).then(res => {
             console.log(res)
         }).catch(err => {
@@ -69,20 +92,30 @@ function CryptoPayment(props) {
         <>
             <Header/>
             <ChoiceContainer>
-                <p>Element: {props.cryptocurrency}</p>
+                <p>Element: {state.cryptocurrency}</p>
                 <p>Quantity: </p>
-                <input placeholder='Quantity' onChange={(e) => {
+                <input placeholder='Quantity ex.200' onChange={(e) => {
                     setQuantity(e.target.value)
-                    totalPrice = Number(props.price)*quantity
                 }}/>
-                <p>Total price: {totalPrice}</p>
+                <button onClick={() => {
+                    setTotalPrice(Number(state.price)*Number(quantity))
+                    console.log(`totalPrice: ${totalPrice}`)
+                    setTimeout(() => setClientCipher(true), 5000)
+                }}>Set quantity</button>
+                <p>Total price: {totalPrice}$</p>
             </ChoiceContainer>
-            <FormContainer onSubmit={handleSubmit(onSubmit)}>
-                <FormInput placeholder='Card number'/>
-                <FormInput placeholder="MM/YY"/>
-                <FormInput placeholder='CVV'/>
-                <FormInput style={{cursor:'pointer'}} type="submit" value="Buy"/>
-            </FormContainer>
+            
+
+            {clientCipher && (
+                <Elements stripe={stripeKey}>
+                    <FormContainer onSubmit={handleSubmit(onSubmit)}>
+                        <FormInput {...register('cardNumber')} placeholder='Card number'/>
+                        <FormInput {...register('cardExpDate')} placeholder="MM/YY"/>
+                        <FormInput {...register('cardCVV')} placeholder='CVV'/>
+                        <FormInput style={{cursor:'pointer'}} type="submit" value="Buy"/>
+                    </FormContainer>
+                </Elements>
+            )}
         </>
     )
 }
