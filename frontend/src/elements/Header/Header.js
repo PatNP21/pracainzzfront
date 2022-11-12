@@ -58,11 +58,6 @@ function Header() {
                 <AiFillWechat/>
             </Option>
             <Option onClick={() => {
-                navigate('/notifications')
-            }}>
-                <AiFillNotification/>
-            </Option>
-            <Option onClick={() => {
                 console.log('search')
                 setSearchVisible(true)
                 getUsers()

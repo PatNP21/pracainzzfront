@@ -111,7 +111,7 @@ app.post('/registerClient', async (req, res) => {
     const {id, firstName, lastName, email, dateOfBirth, joining_date, username, password} = req.body
     const hashedPassword = bcrypt.hashSync(password, 10)
     await pg_client.query('INSERT INTO users (firstName, lastName, email, dateOfBirth, joining_date, username, password) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-    [firstName, lastName, email, new Date(dateOfBirth.toString()), new Date().toLocaleDateString('en-CA'), username, hashedPassword]).then(data => {
+    [firstName, lastName, email, new Date(dateOfBirth.toString()), new Date().toDateString('en-CA'), username, hashedPassword]).then(data => {
         console.log(data)
         res.status(201).json(data)
         //const token =  JWT.sign({id: id, username}, 'elelelele')
@@ -122,7 +122,7 @@ app.post('/registerClient', async (req, res) => {
             to: email,
             subject: 'Activate your account',
             html: `
-                Welcome! Link to activate your account: <a>http://localhost:3000/login/${linkCipher}</a>
+                Welcome! Link to activate your account: <a>http://localhost:3000/login/${linkCipher.toString('base64')}</a>
             `
         })
         stripe.customers.create({
@@ -150,11 +150,13 @@ app.post('/login', async (req, res) => {
             token: token
         }, {expiresIn: '1h'})*/
         //console.log(cookie)
+        cookie = res.cookie('logData', token, {maxAge: 3600000})
+        console.log(cookie)
         res.status(200).json({
             user: data.rows,
             token: token
         })
-        res.send(cookie)
+        //res.send(cookie)
     }).catch(err => {
         //console.log(user, password)
         console.log(err)
@@ -168,6 +170,8 @@ app.get('/getCookie', async (req, res) => {
 
 app.get('/logout', async (req, res) => {
     const {token} = req.body
+
+    res.cookie('logData', '', {maxAge: 1})
 
     /*try {
         jwtrClient.destroy(token)
@@ -184,13 +188,15 @@ app.post('/getEmail', async (req, res) => {
     await pg_client.query('SELECT * FROM users WHERE email = $1', [req.body.email])
     .then((data) => {
         res.status(200).json(data)
-        const recoverMailCipher = crypto.randomBytes(20)
+        console.log(data.rows[0])
+        const recoverMailCipher = crypto.randomBytes(64)
+        console.log(recoverMailCipher.toString('base64'))
         transportMail.sendMail({
             from: `Portal <${process.env.MAIL}>`,
             to: req.body.email,
             subject: 'Recover your password',
             html: `
-                Welcome! Link to activate your account: <a>http://localhost:3000/newPassword/${data.rows[0].id}/${recoverMailCipher}</a>
+                Welcome! Link to activate your account: <a>http://localhost:3000/newPassword/${recoverMailCipher.toString('base64')}/${data.rows[0].id}</a>
             `
         })
     }).catch(err => {
@@ -202,7 +208,8 @@ app.post('/getEmail', async (req, res) => {
 app.put('/changePassword/:id', async (req, res) => {
     const id = req.params.id
     const {password} = req.body
-    await pg_client.query('UPDATE users SET password = $1 WHERE id = $2', [password, id])
+    const hashPass = bcrypt.hashSync(password, 10)
+    await pg_client.query('UPDATE users SET password = $1 WHERE id = $2', [hashPass, id])
     .then((data) => {
         console.log(`id: ${id}`)
         console.log(data)

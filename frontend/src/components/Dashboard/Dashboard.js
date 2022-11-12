@@ -175,14 +175,14 @@ function Dashboard() {
         {/*tworzenie grup */}
         <Widget>
           <RightWidgetBtn onClick={() => {
-              navigate('/createGroupEvent', {state: {item: 'groups'}})
+              navigate('/createGroupEvent')
             }}
           >
             Create group
           </RightWidgetBtn>
 
           <RightWidgetBtn onClick={() => {
-              navigate('/createGroupEvent', {state: {item: 'events'}})
+              navigate('/createGroupEvent')
             }}
           >
               Create event

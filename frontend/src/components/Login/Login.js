@@ -29,6 +29,11 @@ const Input = styled.input`
     border:none;
     border-radius:10px;
 `
+const A = styled.a`
+    text-align:center;
+    display:block;
+    margin:1vh 0;
+`
 const SubmitBtn = styled.input`
     display:block;
     width: 18vw;
@@ -90,6 +95,8 @@ function Login() {
                     </InputField>
                     
                     <SubmitBtn type="submit" value="Sign in"/>
+                    <A href="/recoverPassword">Forgot your password</A>
+                    <A href='/register'>Create a new account</A>
                 </form>
             </Container>
             {/*waitingForResponseModal && 

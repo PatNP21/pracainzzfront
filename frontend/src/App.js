@@ -48,7 +48,7 @@ function App() {
           </Route>
           <Route path="stock" element={<Stock/>} />
           <Route path="recoverPassword" element={<RecoverPassword/>} />
-          <Route path="newPassword/:id/:sth" element={<NewPassword/>} />
+          <Route path="newPassword/:sth/:userID" element={<NewPassword/>} />
           <Route path="myWallet/:userID" element={<Wallet/>}/>
         </Routes>
       </Router>

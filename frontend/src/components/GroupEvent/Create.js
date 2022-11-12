@@ -28,7 +28,7 @@ const SubmitButton = styled.input`
 
 function Create() {
 
-  const {state} = useLocation()
+  //const {state} = useLocation()
   const navigate = useNavigate()
   const {register, handleSubmit} = useForm()
 
