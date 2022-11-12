@@ -11,6 +11,7 @@ import {useFinnhub} from 'react-finnhub'
 import PostHandler from '../../handlers/PostHandler'
 import StockCryptoHandler from '../../handlers/StockCryptoHandler'
 import News from '../News/News'
+import BigWidget from '../../elements/Widgets/BigWidget'
 
 const LeftNav = styled.div`
   width:25vw;
@@ -30,10 +31,19 @@ const Btn = styled.div`
   border-radius: 10px;
   margin:2vh auto;
 `
+const RightWidgetBtn = styled.button`
+  margin:2vh 1vw;
+  width: 80%;
+  height: 3vh;
+  padding:3px 2px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+`
 //headertoWidgets
 const WidgetHeader = styled.div`
   width:100%;
-  height:7px;
+  height:14px;
   padding:2px 0;
   text-align:center;
   font-size:0.8em;
@@ -54,6 +64,10 @@ function Dashboard() {
   const [cookies, setCookie] = useCookies()
   const finnhub = useFinnhub()
   const [newsWidgetItem, setNewsWidgetItem] = useState()
+  const [stockItem, setStockItem] = useState()
+  const [cryptoItem, setCryptoItem] = useState()
+  const [stockPrice, setStockPrice] = useState()
+  const [cryptoPrice, setCryptoPrice] = useState()
 
   //posts
   const [posts, getPosts] = useState()
@@ -67,21 +81,34 @@ function Dashboard() {
 
     finnhub.marketNews('general').then(res => {
       //res.data - Array
-      console.log(res.data)
+      //console.log(res.data)
       setNewsWidgetItem(res.data[Math.floor(Math.random()*(res.data.length))-1])
       console.log(newsWidgetItem)
     }).catch(err => {
       console.log(err)
     })
 
-    /*stock_crypto_handler.getStocks().then(res => {
-      console.log(res.data.data)
+    finnhub.stockSymbols('US').then(res => {
+      console.log(res.data)
+      setStockItem(res.data[Math.floor(Math.random()*(res.data.length))-1])
+      console.log(stockItem)
+      stock_crypto_handler.getAPI(stockItem.symbol).then(data => {
+        setStockPrice(data.data.values[0].open)
+      })
+    }).catch(err => {
+      console.log(err)
     })
 
-    stock_crypto_handler.getCryptocurrencies().then(res => {
-      console.log(res.data.data)
-    })*/
-
+    finnhub.cryptoSymbols('BINANCE').then(res => {
+      console.log(res.data)
+      setCryptoItem(res.data[Math.floor(Math.random()*(res.data.length))-1])
+      console.log(cryptoItem)
+      stock_crypto_handler.getCryptoAPI(cryptoItem.displaySymbol, '1min').then(data => {
+        setCryptoPrice(data.data.values[0].open)
+      })
+    }).catch(err => {
+      console.log(err)
+    })
   }, [])
 
   return (
@@ -101,6 +128,12 @@ function Dashboard() {
             <WidgetHeader>
               Stock
             </WidgetHeader>
+            {stockItem ? 
+            <>
+              <p>{stockItem.description}</p>
+              <p>{stockPrice}</p>
+            </> 
+              : 'null'}
           </Widget>
         </Btn>
 
@@ -111,6 +144,11 @@ function Dashboard() {
             <WidgetHeader>
               Crypto
             </WidgetHeader>
+            {cryptoItem ? 
+            <>
+              <p>{cryptoItem.description}</p>
+              <p>{cryptoPrice}</p>
+            </> : 'null'}
           </Widget>
         </Btn>
 
@@ -134,7 +172,39 @@ function Dashboard() {
       </LeftNav>
       {posts && <PostPanel posts={posts}/>}
       <RightNav>
-        <Widget/>
+        {/*tworzenie grup */}
+        <Widget>
+          <RightWidgetBtn onClick={() => {
+              navigate('/createGroupEvent', {state: {item: 'groups'}})
+            }}
+          >
+            Create group
+          </RightWidgetBtn>
+
+          <RightWidgetBtn onClick={() => {
+              navigate('/createGroupEvent', {state: {item: 'events'}})
+            }}
+          >
+              Create event
+          </RightWidgetBtn>
+        </Widget>
+
+        <Btn>
+          <BigWidget>
+            <WidgetHeader>
+              Groups
+            </WidgetHeader>
+          </BigWidget>
+        </Btn>
+        
+        <Btn>
+          <BigWidget>
+            <WidgetHeader>
+              Events
+            </WidgetHeader>
+          </BigWidget>
+        </Btn>
+        
       </RightNav>
     </div>
   )

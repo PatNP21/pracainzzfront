@@ -12,6 +12,9 @@ const MenuContainer = styled.div`
   margin:2vh auto;
   height:8vh;
 `
+const SearchInput = styled.input`
+  display:block;
+`
 const Select = styled.select`
   border-radius:8px;
   border:none;
@@ -59,17 +62,33 @@ function Stock() {
   const finnhub = useFinnhub()
 
   const [loaded, updateLoaded] = useState(false)
+  const [searchContent, updateSearchContent] = useState('')
   const [stockList, setStockList] = useState([])
   let stockData
+  let stockArray
+  const [filteredStockList, setFilteredStockList] = useState([])
   const [showChart, updateShowChart] = useState(false)
 
   let stock
   //const [stock, selectStock] = useState('')
-
+  //const apiFinnhubStock = finnhub.ApiClient.instance.authentications['api-key']
+  //const finnhubClient = new finnhub.stockSymbols()
 
   useEffect(() => {
-    
-    operateHandler.getStocks().then(res => {
+    finnhub.stockSymbols('US').then(res => {
+      stockArray = res.data.filter(item => {
+        return item//.type === 'Common Stock'
+      })
+      console.log(stockArray)
+      setFilteredStockList(stockArray)
+      console.log(filteredStockList)
+      updateLoaded(true)
+    }).catch(err => {
+      console.log(err)
+    })
+    //console.log(stockArray)
+
+    /*operateHandler.getStocks().then(res => {
       updateLoaded(true)
       //console.log(res.data.data)
       let stockArray = res.data.data
@@ -81,7 +100,8 @@ function Stock() {
       //console.log(properList)
       setStockList(properList.slice(0, 99))
       console.log(stockList)
-    })
+    })*/
+
   }, [])
 
   const getAPI = (stock) => {
@@ -114,6 +134,12 @@ function Stock() {
         <Circles color="#00BFFF" height={80} width={80}/> : 
         <div>
           <MenuContainer>
+            <SearchInput type="text" onChange={(e) => {
+              updateSearchContent(e.target.value)
+              filteredStockList = stockArray.filter(item => {
+                return item.descrption.includes(searchContent.toUpperCase())
+              })
+            }}/>
             <Select
               value={stock}
               onChange={(e) => {
@@ -124,9 +150,9 @@ function Stock() {
                 }
               }
             >
-              {stockList && stockList.map(item => {
+              {filteredStockList.length > 0 && filteredStockList.map(item => {
                 return <option value={item.symbol}>
-                  {item.name}
+                  {item.descrption}
                 </option> 
               })}
             </Select>
@@ -139,7 +165,7 @@ function Stock() {
               Sell
             </OptionButton>
             <OptionButton onClick={() => {
-              navigate('/payment')
+              navigate('/payment', {state: {stock: stock, price: stockData.metric['52WeekLow']}})
             }}>
               Invest
             </OptionButton>

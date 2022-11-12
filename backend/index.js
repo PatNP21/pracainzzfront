@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const pg = require('pg')
+const bcrypt = require('bcryptjs')
 const http = require('http')
 const {PrismaClient} = require('@prisma/client')
 const nodemailer = require('nodemailer')
@@ -108,11 +109,13 @@ app.get('/getUser/:id', async (req, res) => {
 
 app.post('/registerClient', async (req, res) => {
     const {id, firstName, lastName, email, dateOfBirth, joining_date, username, password} = req.body
+    const hashedPassword = bcrypt.hashSync(password, 10)
     await pg_client.query('INSERT INTO users (firstName, lastName, email, dateOfBirth, joining_date, username, password) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-    [firstName, lastName, email, new Date(dateOfBirth.toString()), new Date().toLocaleDateString('en-CA'), username, password]).then(data => {
+    [firstName, lastName, email, new Date(dateOfBirth.toString()), new Date().toLocaleDateString('en-CA'), username, hashedPassword]).then(data => {
         console.log(data)
         res.status(201).json(data)
-        const token =  JWT.sign({id: id, username}, 'elelelele')
+        //const token =  JWT.sign({id: id, username}, 'elelelele')
+        
         const linkCipher = crypto.randomBytes(20)
         transportMail.sendMail({
             from: `Portal <${process.env.MAIL}>`,
@@ -134,12 +137,14 @@ app.post('/registerClient', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     const {user, password} = req.body
-    await pg_client.query('SELECT * FROM users WHERE email = $1 and password = $2', [req.body.user, req.body.password])
+    await pg_client.query('SELECT * FROM users WHERE email = $1 or username = $2 and password = $3', [req.body.user, req.body.user, req.body.password])
     .then((data) => {
         let cookie
         console.log(user, password)
+        console.log(data.rows[0])
+        bcrypt.compareSync(password, data.rows[0].password)
         console.log(data.rows)
-        const token = JWT.sign({id: data.rows.id, user: req.body.user}, 'elelelele')
+        const token = JWT.sign({id: data.rows[0].id, user: req.body.user}, 'elelelele')
         /*cookie = res.cookie('logData', {
             user: data.rows,
             token: token
@@ -455,13 +460,9 @@ app.post('/createPaymentSession', async (req, res) => {
             }
         })
 
-        console.log(cardCredentials)
-
         const card = await stripe.customers.createSource(String(userid), {
             source: cardCredentials.id
         })
-
-        console.log(card)
 
         await stripe.charges.create({
             receipt_email: email,
@@ -471,22 +472,81 @@ app.post('/createPaymentSession', async (req, res) => {
             customer: String(userid)
         }).then(data => {
             console.log(data)
+            stripe.paymentIntents.create({
+                //payment_method: cardCredentials.id,
+                amount: Number(quantity),
+                currency: "usd",
+                automatic_payment_methods: {enabled: true},
+            }).then(dataD => {
+                console.log(dataD)
+                console.log('Success!')
+                res.status(200).json(dataD)
+                transportMail.sendMail({
+                    from: `Portal <${process.env.MAIL}>`,
+                    to: email,
+                    subject: 'Receipt for your purchase',
+                    html: `
+                        Your receipt for your last Crypto purchase : <a>${data.receipt_url}</a>
+                    `
+                })
+            }).catch(err => {
+                console.log(err)
+                res.status(500).json(err)
+            })
         }).catch(err => {
             console.log(err)
         })
 
-        /*const session = await Stripe.paymentIntents.create({
-            amount: Number(quantity),
-            currency: "usd",
-            automatic_payment_methods: {
-                enabled: true,
-            },
-        })*/
-        res.status(200).json({message:'success'})
+        
+        //res.status(200).json({message:'success'})
     } catch(err) {
         console.log(err)
         res.status(500).json({message:"OOPS"})
     }
+})
+
+app.get('/getBoughtStock/:id', async (req, res) => {
+    const id = req.params.id
+    await pg_client.query('SELECT * FROM stockbought')
+    .then(data => {
+        res.status(200).json(data)
+    }).catch(err => {
+        console.log(err)
+        res.status(500).json(err)
+    })
+})
+
+app.get('/getBoughtCrypto/:id', async (req, res) => {
+    const id = req.params.id
+    await pg_client.query('SELECT * FROM cryptobought WHERE owner = $1', [id])
+    .then(data => {
+        res.status(200).json(data)
+    }).catch(err => {
+        console.log(err)
+        res.status(500).json(err)
+    })
+})
+
+app.post('/buyStock', async (req, res) => {
+    const {item, quantity, owner} = req.body
+    await pg_client.query('INSERT INTO StockBought VALUES ($1, $2, $3)', [item, Number(quantity), Number(owner)])
+    .then(data => {
+        res.status(201).json(data)
+    }).catch(err => {
+        console.log(err)
+        res.status(500).json(err)
+    })
+})
+
+app.post('/buyCrypto', async (req, res) => {
+    const {item, quantity, owner} = req.body
+    await pg_client.query('INSERT INTO cryptobought (item, quantity, owner) VALUES ($1, $2, $3)', [item, quantity, owner])
+    .then(data => {
+        res.status(201).json(data)
+    }).catch(err => {
+        console.log(err)
+        res.status(500).json(err)
+    })
 })
 
 server.listen(2023, () => {

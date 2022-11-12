@@ -64,7 +64,7 @@ function PostCreator(props) {
   const onSubmit = (data) => {
     let postData
     console.log(data)
-    postData = {...data, authorId: cookies.loginData[0].id}
+    postData = {...data, authorId: cookies.loginData.data.user[0].id}
     console.log(postData)
     post_handler.writePost(postData).then(res => {
       console.log(res)

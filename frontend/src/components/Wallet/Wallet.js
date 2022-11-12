@@ -1,6 +1,9 @@
 import React, {useState, useEffect} from 'react'
+import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import Header from '../../elements/Header/Header'
+import StockCryptoHandler from '../../handlers/StockCryptoHandler'
+import OwnedItem from './OwnedItem'
 
 const Container = styled.div`
   width:fit-content;
@@ -30,6 +33,30 @@ const Button = styled.button`
 `
 
 function Wallet() {
+
+  const stock_crypto_handler = new StockCryptoHandler()
+  const {userID} = useParams()
+
+  const [ownedCryptoList, setOwnedCryptoList] = useState([])
+
+  useEffect(() => {
+    console.log(`userId: ${userID}`)
+    /*stock_crypto_handler.getBoughtStock(userID)
+    .then(res => {
+      console.log(res)
+    }).catch(err => {
+      console.log(err)
+    })*/
+
+    stock_crypto_handler.getBoughtCrypto(userID)
+    .then(res => {
+      console.log(res.data.rows)
+      setOwnedCryptoList(res.data.rows)
+    }).catch(err => {
+      console.log(err)
+    })
+  },[])
+
   return (
     <>
       <Header/>
@@ -47,6 +74,12 @@ function Wallet() {
           <TitleHeader>
             Crypto
           </TitleHeader>
+          {ownedCryptoList && ownedCryptoList.map(item => {
+              return (<OwnedItem>
+                <p>{item.item}</p>
+                <p>{item.quantity}</p>
+              </OwnedItem>)
+            })}
           <Button>
             Sell
           </Button>

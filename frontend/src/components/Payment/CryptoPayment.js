@@ -3,7 +3,7 @@ import { loadStripe, PaymentIntent } from "@stripe/stripe-js"
 import { Elements, PaymentElement } from "@stripe/react-stripe-js"
 import {useForm} from 'react-hook-form'
 import {useCookies} from 'react-cookie'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import Header from '../../elements/Header/Header'
 import StockCryptoHandler from '../../handlers/StockCryptoHandler'
@@ -46,6 +46,7 @@ function CryptoPayment(props) {
     const {register, handleSubmit} = useForm()
     const [cookies] = useCookies()
     const {state} = useLocation()
+    const navigate = useNavigate()
     //const {cryptocurrency, price} = state
     const [clientCipher, setClientCipher] = useState(false)
 
@@ -75,13 +76,28 @@ function CryptoPayment(props) {
             //element: props.cryptocurrency,
             userid: cookies.loginData.data.user[0].id,
             email: cookies.loginData.data.user[0].email,
-            quantity: quantity,
+            quantity: Number(quantity),
             totalPrice: totalPrice,
             cardNumber: data.cardNumber,
             cardExpDate: data.cardExpDate,
             cardCVV: data.cardCVV
         }).then(res => {
             console.log(res)
+            console.log({
+                item: state.cryptocurrency,
+                owner: Number(cookies.loginData.data.user[0].id),
+                quantity: Number(quantity)
+            })
+            stock_crypto_handler.buyCrypto({
+                item: state.cryptocurrency,
+                owner: Number(cookies.loginData.data.user[0].id),
+                quantity: Number(quantity)
+            }).then(response => {
+                console.log(response)
+            }).catch(err => {
+                console.log(err)
+            })
+            navigate(`/myWallet/${cookies.loginData.data.user[0].id}`)
         }).catch(err => {
             console.log(err)
         })
