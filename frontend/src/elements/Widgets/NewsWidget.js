@@ -3,8 +3,8 @@ import styled from 'styled-components'
 
 const Container = styled.div`
     width: 15vw;
-    height:30vh;
-    margin:2vh auto;
+    height:60vh;
+    margin:8vh auto;
     box-shadow: 0 0 3px gray;
     border-radius:10px;
     overflow:hidden;

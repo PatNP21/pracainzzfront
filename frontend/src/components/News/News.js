@@ -40,7 +40,7 @@ function News() {
   const finnhub = useFinnhub()
 
   useEffect(() => {
-    finnhub.marketNews('general').then(res => {
+    finnhub.marketNews('merger').then(res => {
       console.log(res)
       setNewsList(res.data)
       console.log(newsList)

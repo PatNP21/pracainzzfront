@@ -151,10 +151,15 @@ function Dashboard() {
             </> : 'null'}
           </Widget>
         </Btn>
-
+        
+      </LeftNav>
+      {posts && <PostPanel posts={posts}/>}
+      <RightNav>
+      
         <Btn onClick={() => {
             navigate('/newsList')
-          }}>
+          }}
+        >
             <NewsWidget>
               {newsWidgetItem !== undefined ? 
                 <div>
@@ -168,43 +173,6 @@ function Dashboard() {
               }
             </NewsWidget>
         </Btn>
-        
-      </LeftNav>
-      {posts && <PostPanel posts={posts}/>}
-      <RightNav>
-        {/*tworzenie grup */}
-        <Widget>
-          <RightWidgetBtn onClick={() => {
-              navigate('/createGroupEvent')
-            }}
-          >
-            Create group
-          </RightWidgetBtn>
-
-          <RightWidgetBtn onClick={() => {
-              navigate('/createGroupEvent')
-            }}
-          >
-              Create event
-          </RightWidgetBtn>
-        </Widget>
-
-        <Btn>
-          <BigWidget>
-            <WidgetHeader>
-              Groups
-            </WidgetHeader>
-          </BigWidget>
-        </Btn>
-        
-        <Btn>
-          <BigWidget>
-            <WidgetHeader>
-              Events
-            </WidgetHeader>
-          </BigWidget>
-        </Btn>
-        
       </RightNav>
     </div>
   )

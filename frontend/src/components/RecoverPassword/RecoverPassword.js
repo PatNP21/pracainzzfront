@@ -7,7 +7,7 @@ const Container = styled.div`
     width:fit-content;
     height:fit-content;
     padding: 20px;
-    box-shadow: 2px 2px 2px #777;
+    box-shadow: 0 0 3px #666;
     border-radius:10px;
     margin: 20vh auto;
 `
@@ -15,7 +15,8 @@ const InputField = styled.div`
     width:fit-content;
     height:fit-content;
     margin: 1vh 0;
-    border:1px solid #999;
+    border:none;
+    box-shadow:0 0 1px #666;
     border-radius:10px;
 `
 const Input = styled.input`

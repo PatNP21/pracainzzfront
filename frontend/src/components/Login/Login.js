@@ -4,14 +4,14 @@ import { useNavigate } from 'react-router-dom'
 import { useCookies } from 'react-cookie';
 import styled from 'styled-components'
 import AccountHandler from '../../handlers/AccountHandler'
-import LoadingModal from '../../modals/LoadingModal';
-import { Modal, Typography, Box, Button } from '@mui/material';
+import Loader from '../../modals/Loader';
+import Modal from '../../modals/Modal';
 
 const Container = styled.div`
     width:fit-content;
     height:fit-content;
     padding: 20px;
-    box-shadow: 2px 2px 2px #777;
+    box-shadow: 0 0 3px #777;
     border-radius:10px;
     margin: 20vh auto;
 `
@@ -78,7 +78,6 @@ function Login() {
             setWaitingForResponseModal(false)
             console.log(err)
             setOpenFailureModal(true)
-            alert('User not found')
         })
     }
 
@@ -99,20 +98,17 @@ function Login() {
                     <A href='/register'>Create a new account</A>
                 </form>
             </Container>
-            {/*waitingForResponseModal && 
+            {waitingForResponseModal && 
+                <Loader/>
+            }
+            {openFailureModal && 
                 <Modal>
+                    <div>User not found</div>
+                    <button onClick={() => {
+                        setOpenFailureModal(false)
+                    }}>OK</button>
                 </Modal>
-            */}
-            <Modal
-                open={openFailureModal}
-                onClose={() => setOpenFailureModal(false)}
-            >
-                <Box style={style}>
-                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        User not found. Make sure you entered proper data!
-                    </Typography>
-                </Box>
-            </Modal>
+            }
         </>
     )
 }

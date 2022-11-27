@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
-import { loadStripe, PaymentIntent } from "@stripe/stripe-js"
-import { Elements, PaymentElement } from "@stripe/react-stripe-js"
+import { loadStripe } from "@stripe/stripe-js"
+import { Elements } from "@stripe/react-stripe-js"
 import { useLocation, useNavigate } from 'react-router-dom'
 import {useCookies} from 'react-cookie'
 import {useForm} from 'react-hook-form'
@@ -10,15 +10,15 @@ import StockCryptoHandler from '../../handlers/StockCryptoHandler'
 
 const ChoiceContainer = styled.div`
     float:left;
-    width:40vw;
-    margin:3vh auto;
+    width:35vw;
+    margin:10vh 10vw;
     height:fit-content;
     border-radius:10px;
     box-shadow:0 0 3px gray;   
-    padding:2vh 0;
+    padding:2vh 0 2vh 5vw;
 `
 const FormContainer = styled.form`
-    margin:3vh auto;
+    margin:10vh auto;
     float:left;
     width:20vw;
     height:fit-content;
@@ -60,13 +60,44 @@ function Payment(props) {
     })
 
     const onSubmit = (data) => {
-        console.log(data)
-        stock_crypto_handler.paymentSession({
+        console.log({
+            userid: cookies.loginData.data.user[0].id,
+            email: cookies.loginData.data.user[0].email,
+            quantity: Number(quantity),
             element: state.stock,
             quantity: quantity,
-            totalPrice: totalPrice
+            totalPrice: totalPrice,
+            cardNumber: data.cardNumber,
+            cardExpDate: data.cardExpDate,
+            cardCVV: data.cardCVV
+        })
+        stock_crypto_handler.paymentSession({
+            userid: cookies.loginData.data.user[0].id,
+            email: cookies.loginData.data.user[0].email,
+            quantity: Number(quantity),
+            element: state.stock,
+            quantity: quantity,
+            totalPrice: totalPrice,
+            cardNumber: data.cardNumber,
+            cardExpDate: data.cardExpDate,
+            cardCVV: data.cardCVV
         }).then(res => {
             console.log(res)
+            console.log({
+                item: state.stock,
+                owner: Number(cookies.loginData.data.user[0].id),
+                quantity: Number(totalPrice)
+            })
+            stock_crypto_handler.buyStock({
+                item: state.stock,
+                owner: Number(cookies.loginData.data.user[0].id),
+                quantity: Number(totalPrice)
+            }).then(response => {
+                console.log(response)
+            }).catch(err => {
+                console.log(err)
+            })
+            navigate(`/myWallet/${cookies.loginData.data.user[0].id}`)
         }).catch(err => {
             console.log(err)
         })

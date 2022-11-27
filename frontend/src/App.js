@@ -19,6 +19,7 @@ import StockCryptoHandler from './handlers/StockCryptoHandler'
 import ExtendedNewsInfo from './components/News/ExtendedNewsInfo';
 import Payment from './components/Payment/Payment';
 import Create from './components/GroupEvent/Create';
+import ExtendedOwnedItem from './components/Wallet/ExtendedOwnedItem';
 
 function App() {
   const operateHandler = new StockCryptoHandler()
@@ -49,7 +50,9 @@ function App() {
           <Route path="stock" element={<Stock/>} />
           <Route path="recoverPassword" element={<RecoverPassword/>} />
           <Route path="newPassword/:sth/:userID" element={<NewPassword/>} />
-          <Route path="myWallet/:userID" element={<Wallet/>}/>
+          <Route path="myWallet/:userID" element={<Wallet/>}>
+            <Route path="item" element={<ExtendedOwnedItem/>}/>
+          </Route>
         </Routes>
       </Router>
     </FinnhubProvider>

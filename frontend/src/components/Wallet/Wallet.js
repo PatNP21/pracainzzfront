@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import Header from '../../elements/Header/Header'
 import StockCryptoHandler from '../../handlers/StockCryptoHandler'
 import OwnedItem from './OwnedItem'
@@ -24,10 +25,15 @@ const TitleHeader = styled.div`
   height:6vh;
   text-align:center;
 `
+const WidgetBtn = styled.div`
+  width:90%;
+  height:fit-content;
+  margin:auto;
+`
 const Button = styled.button`
   border:none;
   border-radius:10px;
-  margin:auto;
+  margin-left:10vw;
   padding:1vh 1vw;
   cursor:pointer;
 `
@@ -36,22 +42,26 @@ function Wallet() {
 
   const stock_crypto_handler = new StockCryptoHandler()
   const {userID} = useParams()
+  const navigate = useNavigate()
 
   const [ownedCryptoList, setOwnedCryptoList] = useState([])
+  const [ownedStockList, setOwnedStockList] = useState([])
 
   useEffect(() => {
     console.log(`userId: ${userID}`)
-    /*stock_crypto_handler.getBoughtStock(userID)
-    .then(res => {
-      console.log(res)
-    }).catch(err => {
-      console.log(err)
-    })*/
 
     stock_crypto_handler.getBoughtCrypto(userID)
     .then(res => {
       console.log(res.data.rows)
       setOwnedCryptoList(res.data.rows)
+    }).catch(err => {
+      console.log(err)
+    })
+
+    stock_crypto_handler.getBoughtStock(userID)
+    .then(res => {
+      console.log(res.data.rows)
+      setOwnedStockList(res.data.rows)
     }).catch(err => {
       console.log(err)
     })
@@ -65,6 +75,18 @@ function Wallet() {
           <TitleHeader>
             Stock
           </TitleHeader>
+          {ownedStockList && ownedStockList.map(item => {
+              return (
+                <WidgetBtn onClick={() => {
+                  navigate(`/myWallet/${userID}/item`)
+                }}>
+                  <OwnedItem>
+                    <p>{item.item}</p>
+                    <p>{item.quantity}</p>
+                    <button>Donate someone</button>
+                  </OwnedItem>
+                </WidgetBtn>)
+            })}
           <Button>
             Sell
           </Button>
@@ -75,10 +97,17 @@ function Wallet() {
             Crypto
           </TitleHeader>
           {ownedCryptoList && ownedCryptoList.map(item => {
-              return (<OwnedItem>
-                <p>{item.item}</p>
-                <p>{item.quantity}</p>
-              </OwnedItem>)
+              return (
+                <WidgetBtn onClick={() => {
+                  navigate(`/myWallet/${userID}/item`)
+                }}>
+                  <OwnedItem>
+                    <p>{item.item}</p>
+                    <p>{item.quantity}</p>
+                    <Button>Donate someone</Button>
+                  </OwnedItem>
+                </WidgetBtn>
+              )
             })}
           <Button>
             Sell

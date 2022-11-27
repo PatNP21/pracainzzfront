@@ -10,7 +10,7 @@ const Container = styled.div`
     width:fit-content;
     height:fit-content;
     padding: 20px;
-    box-shadow: 2px 2px 2px #777;
+    box-shadow: 0 0 3px #666;
     border-radius:10px;
     margin: 20vh auto;
 `
@@ -51,10 +51,6 @@ function NewPassword() {
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <InputField>
                         <Input type="password" placeholder='Enter new pasword' {...register('password')}/>
-                    </InputField>
-                    
-                    <InputField>
-                        <Input type="password" placeholder='Repeat the password' {...register('repeatPassword')}/>
                     </InputField>
                     
                     <Input type="submit" value="Submit"/>

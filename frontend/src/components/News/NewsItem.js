@@ -26,7 +26,6 @@ function NewsItem(props) {
         <NewsHeader>
           {props.data.headline}
         </NewsHeader>
-        <NewsImage src={props.data.image}/>
     </Container>
   )
 }

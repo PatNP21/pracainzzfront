@@ -7,7 +7,7 @@ const Container = styled.div`
     width:fit-content;
     height:fit-content;
     padding: 20px;
-    box-shadow: 2px 2px 2px #777;
+    box-shadow: 0 0 3px #666;
     border-radius:10px;
     margin: 20vh auto;
 `

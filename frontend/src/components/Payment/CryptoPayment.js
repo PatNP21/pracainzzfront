@@ -10,15 +10,15 @@ import StockCryptoHandler from '../../handlers/StockCryptoHandler'
 
 const ChoiceContainer = styled.div`
     float:left;
-    width:40vw;
-    margin:3vh auto;
+    width:35vw;
+    margin:10vh 10vw;
     height:fit-content;
     border-radius:10px;
     box-shadow:0 0 3px gray;   
-    padding:2vh 0;
+    padding:2vh 0 2vh 5vw;
 `
 const FormContainer = styled.form`
-    margin:3vh auto;
+    margin:10vh auto;
     float:left;
     width:20vw;
     height:fit-content;

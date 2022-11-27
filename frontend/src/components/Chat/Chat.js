@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import ProfileHandler from '../../handlers/ProfileHandler'
 import Header from '../../elements/Header/Header'
 import styled from 'styled-components'
+import ChatHandler from '../../handlers/ChatHandler'
 import {useForm} from 'react-hook-form'
 import {useParams} from 'react-router-dom'
 import {useCookies} from 'react-cookie'
@@ -28,6 +29,7 @@ const Converser = styled.h4`
 const Grid = styled.div`
   width:100%;
   height:60vh;
+  overflow:scroll;
 `
 const MessagePlot = styled.div`
   width:100%;
@@ -80,6 +82,7 @@ const SubmitInput = styled.input`
 function Chat() {
 
   const profile_handler = new ProfileHandler()
+  const chat_handler = new ChatHandler()
 
   const backendURL = 'http://localhost:2023'
   const socket = io(backendURL, { autoConnect: false }) //connect(backendURL)
@@ -100,7 +103,7 @@ function Chat() {
 
   useEffect(() => {
     profile_handler.getUser(userID).then(res => {
-      setConverser(`${res.data.rows[0].firstname} ${res.data.rows[0].lastname}`)
+      setConverser(res.data.rows[0].id)
       socket.onAny((event, ...args) => {
         console.log(event, args);
       });
@@ -113,14 +116,13 @@ function Chat() {
 
     let count = 0
     let firstname, lastname
-    if(count === 0 && firstname !== cookies.loginData[0].firstname && lastname !== cookies.loginData[0].lastname) {
-      socket.emit('new-chat', `${cookies.loginData[0].firstname} ${cookies.loginData[0].lastname}`)
-      firstname = cookies.loginData[0].firstname
-      lastname = cookies.loginData[0].lastname
+    socket.emit('new-chat', `${cookies.loginData.data.user[0].firstname} ${cookies.loginData.data.user[0].lastname}`)
+    /*if(count === 0 && firstname !== cookies.loginData.data.user[0].firstname && lastname !== cookies.loginData.data.user[0].lastname) {
+      socket.emit('new-chat', `${cookies.loginData.data.user[0].firstname} ${cookies.loginData.data.user[0].lastname}`)
+      firstname = cookies.loginData.data.user[0].firstname
+      lastname = cookies.loginData.data.user[0].lastname
       count++
-    } else {
-      return
-    }
+    }*/
     
   }, [])
 
@@ -133,9 +135,9 @@ function Chat() {
   }
   let count = 0
   socket.on('receive_message', (data) => {
-    if(data.receiver === `${cookies.loginData[0].firstname} ${cookies.loginData[0].lastname}` || data.author === `${cookies.loginData[0].firstname} ${cookies.loginData[0].lastname}`) {
+    if(data.receiver === `${cookies.loginData.data.user[0].firstname} ${cookies.loginData.data.user[0].lastname}` || data.author === `${cookies.loginData.data.user[0].firstname} ${cookies.loginData.data.user[0].lastname}`) {
       createElements()
-      if(data.author === `${cookies.loginData[0].firstname} ${cookies.loginData[0].lastname}`) {
+      if(data.author === `${cookies.loginData.data.user[0].firstname} ${cookies.loginData.data.user[0].lastname}`) {
         MessagePlot.appendChild(YourMessage(data.content))
       } else {
         MessagePlot.appendChild(OtherUserMessage(data.content))
@@ -173,12 +175,15 @@ function Chat() {
   }
 
   const sendMessage = (data) => {
-    data = {...data, author: `${cookies.loginData[0].firstname} ${cookies.loginData[0].lastname}`, receiver: converser}
+    data = {...data, author: cookies.loginData.data.user[0].id, receiver: converser}
     createElements()
     try {
-      socket.emit('send_message', data)
+      
+      chat_handler.saveChatMessage(data).then(() => {
+        socket.emit('send_message', data)
+      })
       text_input.value = ''
-      console.log('message sent')
+      console.log(data)
     } catch(err) {
       console.log(err)
     }

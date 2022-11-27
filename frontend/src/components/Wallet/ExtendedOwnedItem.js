@@ -1,8 +1,8 @@
 import React from 'react'
 
-function ExtendedOwnedItem() {
+function ExtendedOwnedItem(props) {
   return (
-    <div>ExtendedOwnedItem</div>
+    <div>{props.children}</div>
   )
 }
 

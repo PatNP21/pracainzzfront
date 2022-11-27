@@ -64,18 +64,6 @@ const PostOption = styled.button`
     border:none;
 `
 
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-};
-
 function PostItem(props) {
 
     const post_handler = new PostHandler()
@@ -99,7 +87,7 @@ function PostItem(props) {
             console.log(author)
             setLoadedState(true)
         })
-        fromBuffer = btoa(String.fromCharCode(...new Uint8Array(props.multimedia)))
+        //fromBuffer = btoa(String.fromCharCode(...new Uint8Array(props.multimedia)))
         console.log(props.multimedia)
         console.log(fromBuffer)
     }, [])
@@ -121,39 +109,19 @@ function PostItem(props) {
         {loadedState && <Container>
             <Avatar src={avatar}/>
             <AuthorHeader>{author}</AuthorHeader>
-            {props.author !== cookies.loginData.data.user[0].id ? 
+            {props.author !== cookies.loginData.data.user[0].id &&
                 <DonateButton onClick={() => {
-                    navigate('/myWallet/1')
+                    navigate(`/myWallet/${cookies.loginData.data.user[0].id}`)
                 }}>
                     Donate
-                </DonateButton> : 
-                <PostOptions>
-                    <PostOption onClick={deletePost(props.post_id)}>
-                        <HiTrash className='fa fa-2x'/>
-                    </PostOption>
-
-                    <PostOption>
-                        <AiFillEdit/>
-                    </PostOption>
-                </PostOptions>
+                </DonateButton>
             }
             <CreatingDate>{props.creatingDate}</CreatingDate>
             <Content>
-                <img src={`${props.multimedia}:image/png;base64,${fromBuffer}`}/>
                 {props.content}
             </Content>
             <CommentSection post_id={props.post_id}/>
         </Container>}
-        {/*<Modal
-            open={openSuccessModal}
-            onClose={() => setOpenSuccessModal(false)}
-        >
-            <Box style={style}>
-                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                    XD
-                </Typography>
-            </Box>
-        </Modal>*/}
     </div>
   )
 }

@@ -6,25 +6,23 @@ const Container = styled.div`
     width:15vw;
     height:10vh;
     border-radius: 10px;
-    box-shadow: 0 0 3px gray;
+    box-shadow: 0 0 4px #000080;
+    font-family: 'Raleway', sans-serif;
+    justify-content:center;
+    align-items:center;
 `
-const Avatar = styled.img`
-    width: 40px;
-    height:40px;
-    border-radius:50%;
-    overflow:hidden;
-    display:inline-block;
-    float:left;
-`
-const UserFirstName = styled.h4`
-  margin:auto;
-  float:left;
+const UserFirstName = styled.div`
+  height:fit-content;
+  width:fit-content;
+  font-size:1.8rem;
+  margin:2vh auto;
+  justify-content:center;
+  align-items:center;
 `
 
 function ProfileWidget(props) {
   return (
     <Container>
-        <Avatar src={avatar}/>
         <UserFirstName>{props.firstname}</UserFirstName>
     </Container>
   )

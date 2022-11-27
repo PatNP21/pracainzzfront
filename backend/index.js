@@ -7,10 +7,7 @@ const {PrismaClient} = require('@prisma/client')
 const nodemailer = require('nodemailer')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
-const redis = require('redis')
 const JWT = require('jsonwebtoken')
-const JWT_redis = require('jwt-redis').default
-const crypto = require('crypto')
 const stripe = require('stripe')('sk_test_51LnUboDIfBxVZtZzXpHT2Bqu24JfNb0t3lW3clIBSin5sIBN5gCGHqZNpE6PqnpyfC8GBE4rnhqsUiAcouktxv7j00wzxPpnQu')
 require('dotenv').config()
 
@@ -63,6 +60,8 @@ io.on('connection', (socket) => {
     //console.log(`user connected: ${socket.id}`)
 
     socket.on('send_message', (data) => {
+        console.log(data)
+       // pg_client.query('INSERT INTO chats VALUES()')
         socket.broadcast.emit('receive_message', data)
     })
 
@@ -116,7 +115,7 @@ app.post('/registerClient', async (req, res) => {
         res.status(201).json(data)
         //const token =  JWT.sign({id: id, username}, 'elelelele')
         
-        const linkCipher = crypto.randomBytes(20)
+        const linkCipher = JWT.sign(email, 'elelele')
         transportMail.sendMail({
             from: `Portal <${process.env.MAIL}>`,
             to: email,
@@ -189,14 +188,14 @@ app.post('/getEmail', async (req, res) => {
     .then((data) => {
         res.status(200).json(data)
         console.log(data.rows[0])
-        const recoverMailCipher = crypto.randomBytes(64)
-        console.log(recoverMailCipher.toString('base64'))
+        const token = JWT.sign({email: data.rows[0].email}, 'elelelele')
+        console.log(token)
         transportMail.sendMail({
             from: `Portal <${process.env.MAIL}>`,
             to: req.body.email,
             subject: 'Recover your password',
             html: `
-                Welcome! Link to activate your account: <a>http://localhost:3000/newPassword/${recoverMailCipher.toString('base64')}/${data.rows[0].id}</a>
+                Welcome! Link to activate your account: <a>http://localhost:3000/newPassword/${token}/${data.rows[0].id}</a>
             `
         })
     }).catch(err => {
@@ -220,7 +219,7 @@ app.put('/changePassword/:id', async (req, res) => {
     })
 })
 
-app.delete('/deleteUser', async (req, res) => {
+app.delete('/deleteUser/:id', async (req, res) => {
     const id = req.params.id
     await pg_client.query('DELETE FROM users WHERE id = $1', [id])
     .then((data) => {
@@ -230,11 +229,6 @@ app.delete('/deleteUser', async (req, res) => {
         res.status(500).json(err)
     })
 })
-
-app.put('/changeData', async (req, res) => {
-
-})
-
 
 //POSTS and COMMENTS
 
@@ -314,14 +308,6 @@ app.post('/addComment', async (req, res) => {
     })
 })
 
-app.put('/editComment', async (req, res) => {
-    //
-})
-
-app.delete('/deleteComment', async (req, res) => {
-    //
-})
-
 app.get('/getComments', async (req, res) => {
     const id = req.params.id
     await pg_client.query('SELECT * FROM comments')
@@ -344,102 +330,6 @@ app.get('/getComments/:id', async (req, res) => {
         console.log(err)
         res.status(500).json(err)
     })
-})
-
-//CONTACTS
-app.post('/sendRequest', async (req, res) => {
-    await pg_client.query('INSERT INTO relations_requests (begun, sender, receiver) VALUES ($1, $2, $3)', [new Date().toLocaleDateString('en-CA'), req.body.sender, req.body.receiver])
-    .then(data => {
-        res.status(201).json(data)
-    }).catch(err => {
-        console.log(err)
-        res.status(500).json(err)
-    })
-})
-
-app.get('/getRequests/:id', async (req, res) => {
-    const id = req.params.id
-    await pg_client.query('SELECT * FROM relations_requests where receiver = $1', [id])
-    .then(data => {
-        res.status(200).json(data)
-    }).catch(err => {
-        console.log(err)
-        res.status(500).json(err)
-    })
-})
-
-app.post('/undoRequest', async (req, res) => {
-    const {sender, receiver} = req.body
-    await pg_client.query('DELETE FROM relations_requests WHERE sender = $1 AND receiver = $2', [sender, receiver])
-    .then(data => {
-        res.status(200).json(data)
-    }).catch(err => {
-        console.log(err)
-        res.status(500).json(err)
-    })
-})
-
-app.post('/addFriend', async (req, res) => {
-    const {first_partner, second_partner} = req.body
-    await pg_client.query('INSERT INTO relationships(begun, first_partner, second_partner) VALUES ($1, $2, $3)', [new Date().toLocaleDateString('en-CA'), first_partner, second_partner])
-    .then(data => {
-        console.log(data)
-        res.status(201).json(data)
-    }).catch(err => {
-        console.log(err)
-        res.status(500).json(err)
-    })
-})
-
-app.get('/getFriends/:id', async (req, res) => {
-    const id = req.params.id
-    await pg_client.query('SELECT * FROM relationships WHERE first_partner = $1 OR second_partner = $1', [id])
-    .then(data => {
-        console.log(data)
-        res.status(200).json(data)
-    }).catch(err => {
-        console.log(err)
-        res.status(500).json(err)
-    })
-})
-
-app.post('/deleteFriend/:id', async (req, res) => {
-    const id = req.params.id
-    await pg_client.query('DELETE FROM relationships WHERE first_partner = $1 and second_partner = $2 OR first_partner = $2 and second_partner = $1', [loggedUser, id])
-    .then(data => {
-        console.log(data)
-        res.status(200).json(data)
-    }).catch(err => {
-        console.log(err)
-        res.status(500).json(err)
-    })
-})
-
-app.post('/blockUser/:id', async (req, res) => {
-    const id = req.params.id
-    await pg_client.query('INSERT INTO relations_blocked (blocker, blocked) VALUES ($1, $2)', [blocker, id])
-    .then(data => {
-        res.status(201).json(data)
-    }).catch(err => {
-        console.log(err)
-        res.status(500).json(err)
-    })
-})
-
-app.post('/unblockUser/:id', async (req, res) => {
-    const id = req.params.id
-    await pg_client.query('DELETE FROM relations_blocked WHERE blocker = $1 AND blocked = $2)', [blocker, id])
-    .then(data => {
-        res.status(201).json(data)
-    }).catch(err => {
-        console.log(err)
-        res.status(500).json(err)
-    })
-})
-
-//NOTIFICATIONS
-app.get('/getNotifications', async (req, res) => {
-    
 })
 
 //PAYMENTS
@@ -473,7 +363,7 @@ app.post('/createPaymentSession', async (req, res) => {
 
         await stripe.charges.create({
             receipt_email: email,
-            amount: quantity,
+            amount: Math.round(Number(totalPrice)*100),
             currency: 'usd',
             card: card.id,
             customer: String(userid)
@@ -481,7 +371,7 @@ app.post('/createPaymentSession', async (req, res) => {
             console.log(data)
             stripe.paymentIntents.create({
                 //payment_method: cardCredentials.id,
-                amount: Number(quantity),
+                amount: Math.round(Number(totalPrice)*100),
                 currency: "usd",
                 automatic_payment_methods: {enabled: true},
             }).then(dataD => {
@@ -514,7 +404,7 @@ app.post('/createPaymentSession', async (req, res) => {
 
 app.get('/getBoughtStock/:id', async (req, res) => {
     const id = req.params.id
-    await pg_client.query('SELECT * FROM stockbought')
+    await pg_client.query('SELECT * FROM stockbought WHERE owner = $1', [id])
     .then(data => {
         res.status(200).json(data)
     }).catch(err => {
@@ -535,8 +425,42 @@ app.get('/getBoughtCrypto/:id', async (req, res) => {
 })
 
 app.post('/buyStock', async (req, res) => {
-    const {item, quantity, owner} = req.body
-    await pg_client.query('INSERT INTO StockBought VALUES ($1, $2, $3)', [item, Number(quantity), Number(owner)])
+    const {item, quantity, totalPrice, owner} = req.body
+    await pg_client.query('INSERT INTO stockbought (item, quantity, owner) VALUES ($1, $2, $3)', [item, quantity, owner])
+    .then(data => {
+        res.status(201).json(data)
+        stripe.products.create({
+            name: item,
+            metadata: {price: totalPrice}
+        })
+    }).catch(err => {
+        console.log(err)
+        res.status(500).json(err)
+    })
+})
+
+app.post('/buyCrypto', async (req, res) => {
+    const {item, quantity, totalPrice, owner} = req.body
+    await pg_client.query('INSERT INTO cryptobought (item, quantity, owner) VALUES ($1, $2, $3)', [item, quantity, owner])
+    .then(data => {
+        res.status(201).json(data)
+        stripe.products.create({
+            name: item,
+            metadata: {price: totalPrice},
+            default_price_data: Math.round(Number(totalPrice)*100)
+        }).then(response => {
+            console.log(response)
+        })
+    }).catch(err => {
+        console.log(err)
+        res.status(500).json(err)
+    })
+})
+
+app.post('/addChatMessage', async (req, res) => {
+    const {content, author, receiver} = req.body
+    console.log(req.body)
+    await pg_client.query('INSERT INTO chats (content, sender, receiver) VALUES ($1, $2, $3)', [content, author, receiver])
     .then(data => {
         res.status(201).json(data)
     }).catch(err => {
@@ -545,11 +469,10 @@ app.post('/buyStock', async (req, res) => {
     })
 })
 
-app.post('/buyCrypto', async (req, res) => {
-    const {item, quantity, owner} = req.body
-    await pg_client.query('INSERT INTO cryptobought (item, quantity, owner) VALUES ($1, $2, $3)', [item, quantity, owner])
+app.get('/getChatMessages', async (req, res) => {
+    await pg_client.query('SELECT * FROM chats')
     .then(data => {
-        res.status(201).json(data)
+        res.status(200).json(data)
     }).catch(err => {
         console.log(err)
         res.status(500).json(err)

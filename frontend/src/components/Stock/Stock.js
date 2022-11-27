@@ -6,6 +6,7 @@ import {Circles} from 'react-loader-spinner'
 import { FinnhubProvider, useFinnhub } from 'react-finnhub'
 import Chart from './../../elements/Chart'
 import styled from 'styled-components'
+import Loader from '../../modals/Loader'
 
 const MenuContainer = styled.div`
   width:fit-content;
@@ -63,109 +64,83 @@ function Stock() {
 
   const [loaded, updateLoaded] = useState(false)
   const [searchContent, updateSearchContent] = useState('')
-  const [stockList, setStockList] = useState([])
-  let stockData
+  let stockList = []
+  const [stockData, setStockData] = useState()
+  const [stockPrice, setStockPrice] = useState()
   let stockArray
   const [filteredStockList, setFilteredStockList] = useState([])
   const [showChart, updateShowChart] = useState(false)
 
   let stock
-  //const [stock, selectStock] = useState('')
-  //const apiFinnhubStock = finnhub.ApiClient.instance.authentications['api-key']
-  //const finnhubClient = new finnhub.stockSymbols()
+  const [selectedStock, selectStock] = useState('')
 
   useEffect(() => {
     finnhub.stockSymbols('US').then(res => {
       stockArray = res.data.filter(item => {
-        return item//.type === 'Common Stock'
+        return item.type === 'Common Stock'
       })
       console.log(stockArray)
-      setFilteredStockList(stockArray)
-      console.log(filteredStockList)
-      updateLoaded(true)
+      stockList = stockArray
+      console.log(stockList)
+      if(stockList.length > 0) {
+        updateLoaded(true)
+      }
+      setFilteredStockList(stockList)
     }).catch(err => {
       console.log(err)
     })
-    //console.log(stockArray)
-
-    /*operateHandler.getStocks().then(res => {
-      updateLoaded(true)
-      //console.log(res.data.data)
-      let stockArray = res.data.data
-      console.log(typeof stockArray)
-      //console.log(stockArray)
-      let properList = stockArray.filter(item => {
-        return (item.currency.includes('USD') && item.type.includes('Common Stock') && item.country.includes("United States"))
-      })
-      //console.log(properList)
-      setStockList(properList.slice(0, 99))
-      console.log(stockList)
-    })*/
+    console.log(filteredStockList.length)
 
   }, [])
 
   const getAPI = (stock) => {
     console.log(stock)
-    finnhub.companyBasicFinancials(stock, 'all').then(res => {
-      console.log(res)
-      stockData = res.data
+    operateHandler.getAPI(stock).then(res => {
+      console.log(res.data.values)
+      setStockData(res.data.values)
       console.log(stockData)
 
+      console.log(Number(stockData[0].low))
+      console.log(Number(stockData[0].high))
+
+      setStockPrice((Math.random()*(Number(stockData[0].high)-Number(stockData[0].low)))+Number(stockData[0].low))
+      console.log(stockPrice)
       if(stockData) {
+
         updateShowChart(true)
       }
     }).catch(err => {
       console.log(`coś poszło nie tak: ${err}`)
     })
-    /*operateHandler.getAPI(stock).then(res => {
-      console.log(res)
-      setStockData(res.data.values)
-      console.log(`stock: ${stock}`)
-      return stock
-    }).catch(err => {
-      console.log(err)
-    })*/
   }
 
   return (
     <>
       <Header/>
       {!loaded ? 
-        <Circles color="#00BFFF" height={80} width={80}/> : 
+        <Loader/> : 
         <div>
           <MenuContainer>
-            <SearchInput type="text" onChange={(e) => {
-              updateSearchContent(e.target.value)
-              filteredStockList = stockArray.filter(item => {
-                return item.descrption.includes(searchContent.toUpperCase())
-              })
-            }}/>
-            <Select
+            <select
               value={stock}
               onChange={(e) => {
                   stock = e.target.value
+                  selectStock(stock)
                   console.log(stock)
-                  getAPI(stock)
-                  return stock
+                  console.log(selectedStock)
+                  getAPI(selectedStock)
                 }
               }
             >
-              {filteredStockList.length > 0 && filteredStockList.map(item => {
-                return <option value={item.symbol}>
-                  {item.descrption}
-                </option> 
+              {filteredStockList.length && filteredStockList.map(item => {
+                return <option value={item.displaySymbol}>{item.description}</option>
               })}
-            </Select>
+            </select>
           </MenuContainer>
 
           <BtnsSection>
             <OptionButton onClick={() => {
-              navigate('/payment')
-            }}>
-              Sell
-            </OptionButton>
-            <OptionButton onClick={() => {
-              navigate('/payment', {state: {stock: stock, price: stockData.metric['52WeekLow']}})
+              navigate('/payment', {state: {stock: selectedStock, price: stockData[0].open}})
             }}>
               Invest
             </OptionButton>
@@ -175,23 +150,23 @@ function Stock() {
             <table>
               <tr>
                 <th>symbol</th>
+                <th>open</th>
                 <th>low</th>
                 <th>high</th>
+                <th>close</th>
                 <th>volume</th>
-                <th>last transaction</th>
               </tr>
               <tr>
-                <td>{stockData && stockData.symbol}</td>
-                <td>{stockData && stockData.metric['52WeekLow']}$</td>
-                <td>{stockData && stockData.metric['52WeekHigh']}$</td>
-                <td></td>
-                <td></td>
+                <td>{selectedStock}</td>
+                <td>{stockData && stockData[0].open}$</td>
+                <td>{stockData && stockData[0].low}$</td>
+                <td>{stockData && stockData[0].high}$</td>
+                <td>{stockData && stockData[0].close}$</td>
+                <td>{stockData && stockData[0].volume}</td>
               </tr>
             </table>
           </Price>
-          <ChartDiv> 
-            {showChart && stockData ? <Chart data={stockData}/> : <p>NONE</p>}
-          </ChartDiv>
+          <Price>{stockPrice} $</Price>
         </div>  
       }
     </>
