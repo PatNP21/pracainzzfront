@@ -42,17 +42,6 @@ const SubmitBtn = styled.input`
     border-radius:10px;
     cursor:pointer;
 `
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 'fit-content',
-    bgcolor: 'white',
-    borderRadius: '10px',
-    boxShadow: '0 0 3px gray',
-    p: 2,
-};
 
 function Login() {
 
@@ -61,22 +50,18 @@ function Login() {
     const navigate = useNavigate()
     const [cookies, setCookie] = useCookies()
     const [waitingForResponseModal, setWaitingForResponseModal] = useState(false)
-    const [openSuccessModal, setOpenSuccessModal] = useState(false)
     const [openFailureModal, setOpenFailureModal] = useState(false)
 
     const account_handler = new AccountHandler()
 
-    const onSubmit = (data) => {
-        console.log(data)
+    const login = (data) => {
         setWaitingForResponseModal(true)
         account_handler.logToService(data).then(res => {
             setWaitingForResponseModal(false)
-            console.log(res)
             setCookie('loginData', res, {SameSite: 'none'})
             navigate('/dashboard')
         }).catch(err => {
             setWaitingForResponseModal(false)
-            console.log(err)
             setOpenFailureModal(true)
         })
     }
@@ -84,7 +69,7 @@ function Login() {
     return (
         <>
             <Container>
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(login)}>
                     <InputField>
                         <Input type="text" placeholder='Email or username' {...register('user')}/>
                     </InputField>

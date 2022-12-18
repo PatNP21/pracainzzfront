@@ -233,8 +233,8 @@ app.delete('/deleteUser/:id', async (req, res) => {
 //POSTS and COMMENTS
 
 app.post('/writePost', async (req, res) => {
-    const {content, authorId, multimedia} = req.body
-    await pg_client.query('INSERT INTO posts (content, authorID, creating_date, multimedia) VALUES ($1, $2, $3, $4)', [content, authorId, new Date().toLocaleDateString('en-CA'), multimedia])
+    const {content, authorId} = req.body
+    await pg_client.query('INSERT INTO posts (content, authorID, creating_date) VALUES ($1, $2, $3)', [content, authorId, new Date().toLocaleDateString('en-CA')])
     .then(data => {
         console.log(data)
         res.status(201).json(data)
@@ -413,9 +413,31 @@ app.get('/getBoughtStock/:id', async (req, res) => {
     })
 })
 
+app.get('/getCountOfStock/:id', async (req, res) => {
+    const id = req.params.id
+    await pg_client.query('SELECT COUNT(*) FROM stockbought WHERE owner = $1', [id])
+    .then(data => {
+        res.status(200).json(data)
+    }).catch(err => {
+        console.log(err)
+        res.status(500).json(err)
+    })
+})
+
 app.get('/getBoughtCrypto/:id', async (req, res) => {
     const id = req.params.id
     await pg_client.query('SELECT * FROM cryptobought WHERE owner = $1', [id])
+    .then(data => {
+        res.status(200).json(data)
+    }).catch(err => {
+        console.log(err)
+        res.status(500).json(err)
+    })
+})
+
+app.get('/getCountOfCrypto/:id', async (req, res) => {
+    const id = req.params.id
+    await pg_client.query('SELECT COUNT(*) FROM cryptobought WHERE owner = $1', [id])
     .then(data => {
         res.status(200).json(data)
     }).catch(err => {

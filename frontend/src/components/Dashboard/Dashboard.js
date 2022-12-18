@@ -10,8 +10,6 @@ import {useCookies} from 'react-cookie'
 import {useFinnhub} from 'react-finnhub'
 import PostHandler from '../../handlers/PostHandler'
 import StockCryptoHandler from '../../handlers/StockCryptoHandler'
-import News from '../News/News'
-import BigWidget from '../../elements/Widgets/BigWidget'
 
 const LeftNav = styled.div`
   width:25vw;
@@ -68,6 +66,8 @@ function Dashboard() {
   const [cryptoItem, setCryptoItem] = useState()
   const [stockPrice, setStockPrice] = useState()
   const [cryptoPrice, setCryptoPrice] = useState()
+  const [boughtStocks, setBoughtStocks] = useState(0)
+  const [boughtCryptos, setBoughtCryptos] = useState(0)
 
   //posts
   const [posts, getPosts] = useState()
@@ -108,6 +108,16 @@ function Dashboard() {
       })
     }).catch(err => {
       console.log(err)
+    })
+
+    stock_crypto_handler.getAmountOfStock(cookies.loginData.data.user[0].id).then(data => {
+      console.log(data)
+      setBoughtStocks(data.data.rows[0].count)
+    })
+
+    stock_crypto_handler.getAmountOfCrypto(cookies.loginData.data.user[0].id).then(data => {
+      console.log(data)
+      setBoughtCryptos(data.data.rows[0].count)
     })
   }, [])
 
@@ -155,6 +165,18 @@ function Dashboard() {
       </LeftNav>
       {posts && <PostPanel posts={posts}/>}
       <RightNav>
+
+        <Btn onClick={() => {
+          navigate(`/myWallet/${cookies.loginData.data.user[0].id}`)
+        }}>
+          <Widget>
+            <WidgetHeader>
+              Wallet
+            </WidgetHeader>
+            <p>Stock: {boughtStocks} items</p>
+            <p>Crypto: {boughtCryptos} items</p>
+          </Widget>
+        </Btn>
       
         <Btn onClick={() => {
             navigate('/newsList')

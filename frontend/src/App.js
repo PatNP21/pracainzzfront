@@ -10,7 +10,6 @@ import Profile from './components/Profile/Profile';
 import RecoverPassword from './components/RecoverPassword/RecoverPassword';
 import NewPassword from './components/RecoverPassword/NewPassword';
 import Stock from './components/Stock/Stock';
-import PaymentFeedback from './components/Payment/PaymentFeedback';
 import CryptoPayment from './components/Payment/CryptoPayment';
 import ChatList from './components/Chat/ChatList';
 import Wallet from './components/Wallet/Wallet';
@@ -18,7 +17,6 @@ import { FinnhubProvider } from 'react-finnhub'
 import StockCryptoHandler from './handlers/StockCryptoHandler'
 import ExtendedNewsInfo from './components/News/ExtendedNewsInfo';
 import Payment from './components/Payment/Payment';
-import Create from './components/GroupEvent/Create';
 import ExtendedOwnedItem from './components/Wallet/ExtendedOwnedItem';
 
 function App() {
@@ -34,7 +32,6 @@ function App() {
           <Route path="register" element={<Register/>} />
           <Route path="payment" element={<Payment/>}/>
           <Route path="cryptoPayment" element={<CryptoPayment/>} />
-          <Route path="paymentFeedback" element={<PaymentFeedback/>} />
           <Route path="chatList" element={<ChatList/>}/>
           <Route path="chat" element={<Chat/>}>
             <Route path=":userID" element={<Chat/>}/>
@@ -43,16 +40,14 @@ function App() {
           <Route path="dashboard" element={<Dashboard/>} />
           <Route path="newsList" element={<News/>} />
           <Route path="news/:id" element={<ExtendedNewsInfo/>}/>
-          <Route path="createGroupEvent" element={<Create/>}/>
           <Route path="profile" element={<Profile/>}>
             <Route path=":userID" element={<Profile/>}/>
           </Route>
           <Route path="stock" element={<Stock/>} />
           <Route path="recoverPassword" element={<RecoverPassword/>} />
           <Route path="newPassword/:sth/:userID" element={<NewPassword/>} />
-          <Route path="myWallet/:userID" element={<Wallet/>}>
-            <Route path="item" element={<ExtendedOwnedItem/>}/>
-          </Route>
+          <Route path="myWallet/:userID" element={<Wallet/>}/>
+          <Route path="item/:itemid" element={<ExtendedOwnedItem/>}/>
         </Routes>
       </Router>
     </FinnhubProvider>

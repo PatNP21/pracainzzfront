@@ -15,13 +15,6 @@ const Textarea = styled.textarea`
     border-radius:10px;
     float:left;
 `
-const Attachment = styled.div`
-  width:fit-content;
-  height:fit-content;
-  float:left;
-  font-size:1.6rem;
-  margin-left:2vw;
-`
 const SumbmitButton = styled.button`
   float:left;
   width:5vw;
@@ -55,19 +48,6 @@ function WriteComment(props) {
           placeholder='Write your comment'
           {...register('content')}
         />
-        <Attachment>
-          <label htmlFor='commentAttachment'>
-            <IoMdAttach/>
-          </label>
-          <input 
-            type="file"
-            id="commentAttachment"
-            {...register('multimedia')}
-            accept="[video/*, image/*]"
-            style={{display:'none'}}
-            onChange={(e) => URL.createObjectURL(e.target.files[0])}
-          />
-        </Attachment>
         <SumbmitButton>Submit</SumbmitButton>
       </form>
     </Container>

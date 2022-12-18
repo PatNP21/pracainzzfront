@@ -4,19 +4,6 @@ import {useForm} from 'react-hook-form'
 import {IoMdAttach} from 'react-icons/io'
 import PostHandler from '../../handlers/PostHandler'
 import { useCookies } from 'react-cookie'
-import { Modal, Typography, Box } from '@mui/material';
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
 
 const Container = styled.div`
     width:42vw;
@@ -34,12 +21,6 @@ const Textarea = styled.textarea`
     border:1px solid gray;
     margin: 2vh auto;
     float:left;
-`
-const Attachment = styled.div`
-  width:fit-content;
-  height:fit-content;
-  float:left;
-  font-size:2rem;
 `
 const SubmitBtn = styled.button`
   width: 8vw;
@@ -79,42 +60,8 @@ function PostCreator(props) {
     <Container>
       <form onSubmit={handleSubmit(onSubmit)} enctype="multipart/form-data">
         <Textarea placeholder='Write your post' {...register('content')}/>
-        <Attachment>
-          <label htmlFor="attachmentInput">
-            <IoMdAttach/>
-          </label>
-          <input 
-            id="attachmentInput" 
-            style={{display:'none'}} 
-            type="file" 
-            onChange={(e) => URL.createObjectURL(e.target.files[0])} 
-            accept="[video/*, image/*]"
-            {...register('multimedia')}
-          />
-        </Attachment>
         <SubmitBtn>Add</SubmitBtn>
       </form>
-      <Modal
-          open={openSuccessModal}
-          onClose={() => setOpenSuccessModal(false)}
-      >
-          <Box style={style}>
-              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                  Adding finished successfully.
-              </Typography>
-          </Box>
-      </Modal>
-
-      <Modal
-          open={openFailureModal}
-          onClose={() => setOpenFailureModal(false)}
-      >
-          <Box style={style}>
-              <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                  Cannot add new post.
-              </Typography>
-          </Box>
-      </Modal>
     </Container>
   )
 }

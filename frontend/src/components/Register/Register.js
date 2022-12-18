@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import {useForm} from 'react-hook-form'
 import styled from 'styled-components'
-import RegisterHandler from './../../handlers/AccountHandler'
+import AccountHandler from './../../handlers/AccountHandler'
 
 const Container = styled.div`
     width:fit-content;
@@ -34,9 +34,9 @@ function Register() {
     //obsługa submit
     const [submittedSuccessfully, setSubmitedSuccessfully] = useState(false)
 
-    const register_handler = new RegisterHandler()
+    const register_handler = new AccountHandler()
 
-    const onSubmit = (data) => {
+    const registerUser = (data) => {
         register_handler.registerNewUser(data).then(res => {
             console.log(res)
             setSubmitedSuccessfully(true)
@@ -47,7 +47,7 @@ function Register() {
 
     return (
         <Container>
-            {!submittedSuccessfully ? <form onSubmit={handleSubmit(onSubmit)}>
+            {!submittedSuccessfully ? <form onSubmit={handleSubmit(registerUser)}>
                 <InputField>
                     <Input type="text" placeholder='First name' {...register('firstName')}/>
                 </InputField>

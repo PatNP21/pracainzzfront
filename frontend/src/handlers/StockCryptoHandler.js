@@ -62,7 +62,15 @@ export default class StockCryptoHandler {
         return axios.get(`${this.baseURL}/getBoughtStock/${id}`)
     }
 
+    getAmountOfStock(id) {
+        return axios.get(`${this.baseURL}/getCountOfStock/${id}`)
+    }
+
     getBoughtCrypto(id) {
         return axios.get(`${this.baseURL}/getBoughtCrypto/${id}`)
+    }
+
+    getAmountOfCrypto(id) {
+        return axios.get(`${this.baseURL}/getCountOfCrypto/${id}`)
     }
 }

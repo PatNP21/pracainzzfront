@@ -6,7 +6,6 @@ import Widget from '../../elements/Widgets/Widget'
 import avatar from './../../avatar.png'
 import PostHandler from '../../handlers/PostHandler'
 import ProfileHandler from '../../handlers/ProfileHandler'
-import FriendsHandler from '../../handlers/FriendsHandler'
 import {useCookies} from 'react-cookie'
 import { useParams } from 'react-router-dom'
 
@@ -56,7 +55,6 @@ function Profile() {
   const [cookies] = useCookies()
   const post_handler = new PostHandler()
   const profile_handler = new ProfileHandler()
-  const friends_handler = new FriendsHandler()
   const {userID} = useParams()
 
   const [userData, setUserData] = useState()
@@ -83,24 +81,6 @@ function Profile() {
     })
   }, [])
 
-  const sendRequest = (el) => {
-    friends_handler.sendRequest(el).then(res => {
-      console.log(el)
-      console.log(res)
-    }).catch(err => {
-      console.log(err)
-    })
-  }
-
-  const undoRequest = (el) => {
-    friends_handler.undoRequest(el).then(res => {
-      console.log(el)
-      console.log(res)
-    }).catch(err => {
-      console.log(err)
-    })
-  }
-
   return (
     <div>
       <Header/>
@@ -117,28 +97,6 @@ function Profile() {
 
           <ProfileData>
             {userData && <p>{userData.firstname} {userData.lastname}</p>}
-            {userID != cookies.loginData[0].id && !requestState && 
-              <Btn onClick={() => {
-                setRequestState(true)
-                sendRequest({
-                  sender: cookies.loginData[0].id,
-                  receiver: Number(userID)
-                })
-              }}>
-                Add relation
-              </Btn>
-            }
-            {userID != cookies.loginData[0].id && requestState &&
-              <Btn onClick={() => {
-                setRequestState(false)
-                undoRequest({
-                  sender: cookies.loginData[0].id,
-                  receiver: Number(userID)
-                })
-              }}>
-                Undo request
-              </Btn>
-            }
           </ProfileData>
         </ProfileView>
         <PanelSpace>

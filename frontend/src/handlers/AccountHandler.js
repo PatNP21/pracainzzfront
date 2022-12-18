@@ -19,8 +19,4 @@ export default class AccountHandler {
     setNewPassword(id, data) {
         return axios.put(`${this.baseURL}/changePassword/${id}`, data)
     }
-
-    deleteUser() {
-        return axios.delete(`${this.baseURL}/deleteUser`)
-    }
 }

@@ -167,6 +167,9 @@ function Stock() {
             </table>
           </Price>
           <Price>{stockPrice} $</Price>
+          <ChartDiv>
+            {showChart && stockData ? <Chart dataToStore={stockData}/> : <p>Brak danych</p>}
+          </ChartDiv>
         </div>  
       }
     </>
