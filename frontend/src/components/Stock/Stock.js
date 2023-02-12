@@ -44,7 +44,7 @@ const Price = styled.div`
   padding:0 2vw;
 `
 const ChartDiv = styled.div`
-  width:80vw;
+  width:60vw;
   max-width:1000px;
   height:fit-content;
   max-height:400px;
@@ -60,52 +60,52 @@ function Stock() {
 
   const navigate = useNavigate()
 
-  const finnhub = useFinnhub()
 
   const [loaded, updateLoaded] = useState(false)
-  const [searchContent, updateSearchContent] = useState('')
   let stockList = []
   const [stockData, setStockData] = useState()
   const [stockPrice, setStockPrice] = useState()
-  let stockArray
-  const [filteredStockList, setFilteredStockList] = useState([])
+  let array
+  const [list, setList] = useState([])
   const [showChart, updateShowChart] = useState(false)
 
   let stock
   const [selectedStock, selectStock] = useState('')
 
   useEffect(() => {
-    finnhub.stockSymbols('US').then(res => {
-      stockArray = res.data.filter(item => {
-        return item.type === 'Common Stock'
+    operateHandler.getStocks().then(res => {
+      array = res.data.data.filter(item => {
+        return item.type === 'Common Stock' && item.country === "United States" && item.exchange === "NASDAQ"
       })
-      console.log(stockArray)
-      stockList = stockArray
-      console.log(stockList)
-      if(stockList.length > 0) {
+      console.log(array)
+      if(array.length > 0) {
+        setList(array)
         updateLoaded(true)
       }
-      setFilteredStockList(stockList)
     }).catch(err => {
       console.log(err)
     })
-    console.log(filteredStockList.length)
+    console.log(list.length)
 
   }, [])
 
   const getAPI = (stock) => {
     console.log(stock)
     operateHandler.getAPI(stock).then(res => {
-      console.log(res.data.values)
-      setStockData(res.data.values)
+      console.log(res.data.rows)
+      //setStockData(1000)
+      setStockData({
+        high: res.data.values[0].high,
+        low: res.data.values[0].low,
+        open: res.data.values[0].open,
+        close: res.data.values[0].close,
+        volume: res.data.values[0].volume,
+        stockPrice: Number(Math.random()*(Number(res.data.values[0].high)-Number(res.data.values[0].low)))+Number(res.data.values[0].low)
+      })
       console.log(stockData)
+      setStockPrice(res.data.values)
 
-      console.log(Number(stockData[0].low))
-      console.log(Number(stockData[0].high))
-
-      setStockPrice((Math.random()*(Number(stockData[0].high)-Number(stockData[0].low)))+Number(stockData[0].low))
-      console.log(stockPrice)
-      if(stockData) {
+      if(stockPrice) {
 
         updateShowChart(true)
       }
@@ -132,15 +132,15 @@ function Stock() {
                 }
               }
             >
-              {filteredStockList.length && filteredStockList.map(item => {
-                return <option value={item.displaySymbol}>{item.description}</option>
+              {list.length && list.map(item => {
+                return <option value={item.symbol}>{item.name}</option>
               })}
             </select>
           </MenuContainer>
 
           <BtnsSection>
             <OptionButton onClick={() => {
-              navigate('/payment', {state: {stock: selectedStock, price: stockData[0].open}})
+              navigate('/payment', {state: {item: selectedStock, price: stockData.open}})
             }}>
               Invest
             </OptionButton>
@@ -158,17 +158,17 @@ function Stock() {
               </tr>
               <tr>
                 <td>{selectedStock}</td>
-                <td>{stockData && stockData[0].open}$</td>
-                <td>{stockData && stockData[0].low}$</td>
-                <td>{stockData && stockData[0].high}$</td>
-                <td>{stockData && stockData[0].close}$</td>
-                <td>{stockData && stockData[0].volume}</td>
+                <td>{stockData && stockData.open}$</td>
+                <td>{stockData && stockData.low}$</td>
+                <td>{stockData && stockData.high}$</td>
+                <td>{stockData && stockData.close}$</td>
+                <td>{stockData && stockData.volume}</td>
               </tr>
             </table>
           </Price>
-          <Price>{stockPrice} $</Price>
+          <Price>{stockData && Number(stockData.stockPrice)} $</Price>
           <ChartDiv>
-            {showChart && stockData ? <Chart dataToStore={stockData}/> : <p>Brak danych</p>}
+            {showChart && stockData ? <Chart dataToStore={stockPrice}/> : <p>N/A</p>}
           </ChartDiv>
         </div>  
       }

@@ -35,28 +35,23 @@ const FormInput = styled.input`
     border:1px solid gray;
 `
 
-function Payment(props) {
+function Payment() {
 
     const stock_crypto_handler = new StockCryptoHandler()
 
     const stripeKey = loadStripe("pk_test_51LnUboDIfBxVZtZzbP6OX1I4rJBANa79eenkO9fHUXg0xuiAFCTCuLCkv6KwuS3JChMmMM9YsIZlA0rqD1bfGQ6u00Sso7PUXB")
-    const stripeClientServer = 'sk_test_51LnUboDIfBxVZtZzXpHT2Bqu24JfNb0t3lW3clIBSin5sIBN5gCGHqZNpE6PqnpyfC8GBE4rnhqsUiAcouktxv7j00wzxPpnQu'
+    //const stripeClientServer = 'sk_test_51LnUboDIfBxVZtZzXpHT2Bqu24JfNb0t3lW3clIBSin5sIBN5gCGHqZNpE6PqnpyfC8GBE4rnhqsUiAcouktxv7j00wzxPpnQu'
     
     const {register, handleSubmit} = useForm()
     const [cookies] = useCookies()
     const {state} = useLocation()
     const navigate = useNavigate()
     const [clientCipher, setClientCipher] = useState(false)
-
     const [quantity, setQuantity] = useState(0)
     const [totalPrice, setTotalPrice] = useState(0)
 
-    const options = {
-        clientSecret: 'sk_test_51LnUboDIfBxVZtZzXpHT2Bqu24JfNb0t3lW3clIBSin5sIBN5gCGHqZNpE6PqnpyfC8GBE4rnhqsUiAcouktxv7j00wzxPpnQu'
-    }
-
     useEffect(() => {
-        console.log(`state: ${state.stock}, ${state.price}`)
+        console.log(`state: ${state.item}, ${state.price}`)
     })
 
     const onSubmit = (data) => {
@@ -64,7 +59,7 @@ function Payment(props) {
             userid: cookies.loginData.data.user[0].id,
             email: cookies.loginData.data.user[0].email,
             quantity: Number(quantity),
-            element: state.stock,
+            element: state.item,
             quantity: quantity,
             totalPrice: totalPrice,
             cardNumber: data.cardNumber,
@@ -75,7 +70,7 @@ function Payment(props) {
             userid: cookies.loginData.data.user[0].id,
             email: cookies.loginData.data.user[0].email,
             quantity: Number(quantity),
-            element: state.stock,
+            element: state.item,
             quantity: quantity,
             totalPrice: totalPrice,
             cardNumber: data.cardNumber,
@@ -84,14 +79,14 @@ function Payment(props) {
         }).then(res => {
             console.log(res)
             console.log({
-                item: state.stock,
+                item: state.item,
                 owner: Number(cookies.loginData.data.user[0].id),
-                quantity: Number(totalPrice)
+                quantity: Number(quantity)
             })
             stock_crypto_handler.buyStock({
-                item: state.stock,
+                item: state.item,
                 owner: Number(cookies.loginData.data.user[0].id),
-                quantity: Number(totalPrice)
+                quantity: Number(quantity)
             }).then(response => {
                 console.log(response)
             }).catch(err => {
@@ -108,7 +103,7 @@ function Payment(props) {
         <>
             <Header/>
             <ChoiceContainer>
-                <p>Element: {state.stock}</p>
+                <p>Element: {state.item}</p>
                 <p>Quantity: </p>
                 <input placeholder='Quantity ex.200' onChange={(e) => {
                     setQuantity(e.target.value)

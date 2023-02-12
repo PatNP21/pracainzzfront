@@ -59,7 +59,7 @@ function Dashboard() {
   const navigate = useNavigate()
   const post_handler = new PostHandler()
   const stock_crypto_handler = new StockCryptoHandler()
-  const [cookies, setCookie] = useCookies()
+  const [cookies] = useCookies()
   const finnhub = useFinnhub()
   const [newsWidgetItem, setNewsWidgetItem] = useState()
   const [stockItem, setStockItem] = useState()
@@ -79,16 +79,16 @@ function Dashboard() {
       getPosts(res.data.rows)
     })
 
-    finnhub.marketNews('general').then(res => {
+    /*finnhub.marketNews('merger').then(res => {
       //res.data - Array
       //console.log(res.data)
       setNewsWidgetItem(res.data[Math.floor(Math.random()*(res.data.length))-1])
       console.log(newsWidgetItem)
     }).catch(err => {
       console.log(err)
-    })
+    })*/
 
-    finnhub.stockSymbols('US').then(res => {
+    /*stock_crypto_handler.getStocks().then(res => {
       console.log(res.data)
       setStockItem(res.data[Math.floor(Math.random()*(res.data.length))-1])
       console.log(stockItem)
@@ -99,7 +99,7 @@ function Dashboard() {
       console.log(err)
     })
 
-    finnhub.cryptoSymbols('BINANCE').then(res => {
+    stock_crypto_handler.getCryptocurrencies().then(res => {
       console.log(res.data)
       setCryptoItem(res.data[Math.floor(Math.random()*(res.data.length))-1])
       console.log(cryptoItem)
@@ -108,7 +108,7 @@ function Dashboard() {
       })
     }).catch(err => {
       console.log(err)
-    })
+    })*/
 
     stock_crypto_handler.getAmountOfStock(cookies.loginData.data.user[0].id).then(data => {
       console.log(data)
@@ -163,11 +163,11 @@ function Dashboard() {
         </Btn>
         
       </LeftNav>
-      {posts && <PostPanel posts={posts}/>}
+      {posts && <PostPanel posts={posts} section="all"/>}
       <RightNav>
 
         <Btn onClick={() => {
-          navigate(`/myWallet/${cookies.loginData.data.user[0].id}`)
+          navigate(`/myWallet/${cookies.loginData.data.user[0].id}`, {state: {level: 'visit'}})
         }}>
           <Widget>
             <WidgetHeader>

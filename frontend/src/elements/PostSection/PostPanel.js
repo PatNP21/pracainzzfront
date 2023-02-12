@@ -15,7 +15,11 @@ function PostPanel(props) {
   })
   return (
     <Space>
-        <PostCreator authorid={props.authorID}/>
+        {props.section === "all" && 
+         <PostCreator 
+          authorid={props.authorID}
+         />
+        }
 
         <PostList postsList={props.posts}/>
     </Space>

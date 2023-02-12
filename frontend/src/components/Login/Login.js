@@ -71,7 +71,7 @@ function Login() {
             <Container>
                 <form onSubmit={handleSubmit(login)}>
                     <InputField>
-                        <Input type="text" placeholder='Email or username' {...register('user')}/>
+                        <Input type="text" placeholder='Email' {...register('user')}/>
                     </InputField>
                     
                     <InputField>

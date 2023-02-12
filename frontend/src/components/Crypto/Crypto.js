@@ -45,7 +45,7 @@ const Price = styled.div`
   text-align:center;
 `
 const ChartDiv = styled.div`
-  width:80vw;
+  width:60vw;
   max-width:1000px;
   height:fit-content;
   max-height:400px;
@@ -60,7 +60,6 @@ function Crypto() {
   const operateHandler = new StockCryptoHandler()
 
   const navigate = useNavigate()
-  const finnhub = useFinnhub()
 
   const [loaded, updateLoaded] = useState(false)
   const [showChart, updateShowChart] = useState(false)
@@ -74,10 +73,10 @@ function Crypto() {
   let cryptoArray = []
 
   useEffect(() => {
-    finnhub.cryptoSymbols('BINANCE').then(res => {
-      console.log(res.data)
-      cryptoArray = res.data.filter(item => {
-        return item.displaySymbol.includes('/USDT')
+    operateHandler.getCryptocurrencies().then(res => {
+      console.log(res.data.data)
+      cryptoArray = res.data.data.filter(item => {
+        return item.symbol.includes('/USD')
       })
       console.log(cryptoArray)
       setCryptoList(cryptoArray)
@@ -87,9 +86,9 @@ function Crypto() {
   }, [])
 
   const getAPI = (optCrypto) => {
-    operateHandler.getCryptoAPI(optCrypto).then(res => {
-      console.log(res.data.values)
-      setCryptoData(res.data.values)
+    operateHandler.getAPI(optCrypto).then(res => {
+      console.log(res)
+      setCryptoData(res.data.data)
       console.log(cryptoData)
 
       if(cryptoData.length > 0) {
@@ -120,7 +119,7 @@ function Crypto() {
                 }}
               >
                 {cryptoList && cryptoList.map(item => {
-                  return <option value={item.displaySymbol}>{item.description}</option>
+                  return <option value={item.symbol}>{item.currency_base}</option>
                 })}
               </select>
             </OptionToChoose>
@@ -128,7 +127,7 @@ function Crypto() {
 
           <BtnsSection>
             <OptionButton onClick={() => {
-                navigate('/cryptoPayment', {state: {cryptocurrency: cryptoToBuy, price: cryptoData[0].open}})
+                navigate('/payment', {state: {item: cryptoToBuy, price: cryptoData[0].open}})
             }}>
               Buy Crypto
             </OptionButton>

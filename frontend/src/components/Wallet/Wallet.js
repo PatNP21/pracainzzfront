@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import Header from '../../elements/Header/Header'
@@ -18,7 +18,7 @@ const Group = styled.div`
   height:70vh;
   border-radius:10px;
   box-shadow:0 0 3px #000080;
-  overflow:hidden;
+  overflow:scroll;
 `
 const TitleHeader = styled.div`
   width:100%;
@@ -43,6 +43,7 @@ function Wallet() {
   const stock_crypto_handler = new StockCryptoHandler()
   const {userID} = useParams()
   const navigate = useNavigate()
+  const {state} = useLocation()
 
   const [ownedCryptoList, setOwnedCryptoList] = useState([])
   const [ownedStockList, setOwnedStockList] = useState([])
@@ -78,18 +79,14 @@ function Wallet() {
           {ownedStockList && ownedStockList.map(item => {
               return (
                 <WidgetBtn onClick={() => {
-                  navigate(`/myWallet/${userID}/item`)
+                  navigate(`/item`, {state: {level: state.level, itemtype: 'stock', item: item.item, quantity: item.item}})
                 }}>
                   <OwnedItem>
                     <p>{item.item}</p>
                     <p>{item.quantity}</p>
-                    <button>Donate someone</button>
                   </OwnedItem>
                 </WidgetBtn>)
             })}
-          <Button>
-            Sell
-          </Button>
         </Group>
 
         <Group>
@@ -99,19 +96,15 @@ function Wallet() {
           {ownedCryptoList && ownedCryptoList.map(item => {
               return (
                 <WidgetBtn onClick={() => {
-                  navigate(`/myWallet/${userID}/item`)
+                  navigate(`/item`, {state: {level: state.level, itemtype: 'crypto', item: item.item, quantity: item.item}})
                 }}>
                   <OwnedItem>
                     <p>{item.item}</p>
                     <p>{item.quantity}</p>
-                    <Button>Donate someone</Button>
                   </OwnedItem>
                 </WidgetBtn>
               )
             })}
-          <Button>
-            Sell
-          </Button>
         </Group>
       </Container>
     </>

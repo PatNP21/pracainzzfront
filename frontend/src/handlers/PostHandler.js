@@ -8,7 +8,7 @@ export default class PostHandler {
         return axios.get(`${this.baseURL}/getAllPosts`)
     }
 
-    getUserPosts(id) {
+    getUsersPosts(id) {
         return axios.get(`${this.baseURL}/getUsersPosts/${id}`)
     }
 

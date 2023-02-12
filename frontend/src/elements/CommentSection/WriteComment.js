@@ -32,7 +32,7 @@ function WriteComment(props) {
 
   const onSubmit = (data) => {
     console.log(props.post_id)
-    const commentJSON = {...data, post: props.post_id, author: cookies.loginData[0].id}
+    const commentJSON = {...data, post: props.post_id, author: cookies.loginData.data.user[0].id}
     console.log(commentJSON)
     post_handler.writeComment(commentJSON).then(res => {
       console.log(res)

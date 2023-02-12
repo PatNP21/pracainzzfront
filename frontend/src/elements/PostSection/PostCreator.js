@@ -42,7 +42,7 @@ function PostCreator(props) {
   const [openSuccessModal, setOpenSuccessModal] = useState(false)
   const [openFailureModal, setOpenFailureModal] = useState(false)
 
-  const onSubmit = (data) => {
+  const writePost = (data) => {
     let postData
     console.log(data)
     postData = {...data, authorId: cookies.loginData.data.user[0].id}
@@ -58,7 +58,7 @@ function PostCreator(props) {
 
   return (
     <Container>
-      <form onSubmit={handleSubmit(onSubmit)} enctype="multipart/form-data">
+      <form onSubmit={handleSubmit(writePost)}>
         <Textarea placeholder='Write your post' {...register('content')}/>
         <SubmitBtn>Add</SubmitBtn>
       </form>

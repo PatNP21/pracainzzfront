@@ -85,14 +85,13 @@ function Chat() {
   const chat_handler = new ChatHandler()
 
   const backendURL = 'http://localhost:2023'
-  const socket = io(backendURL, { autoConnect: false }) //connect(backendURL)
+  const socket = io(backendURL) //connect(backendURL)
 
   const [cookies] = useCookies()
   const {userID} = useParams()
   const {register, handleSubmit} = useForm()
 
   const [converser, setConverser] = useState()
-  const [status, setStatus] = useState()
   let messagesList = []
 
   let text_input
@@ -103,26 +102,15 @@ function Chat() {
 
   useEffect(() => {
     profile_handler.getUser(userID).then(res => {
-      setConverser(res.data.rows[0].id)
-      socket.onAny((event, ...args) => {
-        console.log(event, args);
-      });
+      setConverser(`${res.data.rows[0].id}`)
       //socket.auth = converser
-      socket.connect()
+      
       console.log(converser)
     }).catch(err => {
       console.log(err)
     })
-
-    let count = 0
-    let firstname, lastname
+    socket.connect()
     socket.emit('new-chat', `${cookies.loginData.data.user[0].firstname} ${cookies.loginData.data.user[0].lastname}`)
-    /*if(count === 0 && firstname !== cookies.loginData.data.user[0].firstname && lastname !== cookies.loginData.data.user[0].lastname) {
-      socket.emit('new-chat', `${cookies.loginData.data.user[0].firstname} ${cookies.loginData.data.user[0].lastname}`)
-      firstname = cookies.loginData.data.user[0].firstname
-      lastname = cookies.loginData.data.user[0].lastname
-      count++
-    }*/
     
   }, [])
 
@@ -132,20 +120,14 @@ function Chat() {
 
     MessagePlot = document.createElement('div')
     MessagePlot.setAttribute('class', 'messagePlot')
+    console.log('element created')
   }
-  let count = 0
   socket.on('receive_message', (data) => {
-    if(data.receiver === `${cookies.loginData.data.user[0].firstname} ${cookies.loginData.data.user[0].lastname}` || data.author === `${cookies.loginData.data.user[0].firstname} ${cookies.loginData.data.user[0].lastname}`) {
       createElements()
-      if(data.author === `${cookies.loginData.data.user[0].firstname} ${cookies.loginData.data.user[0].lastname}`) {
-        MessagePlot.appendChild(YourMessage(data.content))
-      } else {
-        MessagePlot.appendChild(OtherUserMessage(data.content))
-      }
+      MessagePlot.appendChild(OtherUserMessage(data.content))
+      
       //messagesList.push(MessagePlot)
       grid.appendChild(MessagePlot)
-      count = 0
-    }
   })
 
 
@@ -177,23 +159,10 @@ function Chat() {
   const sendMessage = (data) => {
     data = {...data, author: cookies.loginData.data.user[0].id, receiver: converser}
     createElements()
-    try {
-      
-      chat_handler.saveChatMessage(data).then(() => {
-        socket.emit('send_message', data)
-      })
-      text_input.value = ''
-      console.log(data)
-    } catch(err) {
-      console.log(err)
-    }
-    
-    
+    socket.emit('send_message', data.content)
+    MessagePlot.appendChild(YourMessage(data.content))
+    chat_handler.saveChatMessage(data)
   }
-
-  /*socketServer.on('connection', () => {
-    console.log('I am connected with backend')
-  })*/
 
   return (
     <div>
@@ -205,9 +174,6 @@ function Chat() {
           </Converser>
         </ConverserPanel>
         <Grid id="chatGrid">
-          {messagesList && messagesList.map(item => {
-            return item
-          })}
         </Grid>
         <InputPlot>
           <InputForm onSubmit={handleSubmit(sendMessage)}>

@@ -5,10 +5,10 @@ import {} from 'chart.js/auto'
 
 function Chart(props) {
 
-  let cryptoChart = {
+  let chart = {
     labels: props.dataToStore.map(item => item.datetime),
     datasets: [{
-      label: crypto,
+      label: 'label',
       data: props.dataToStore.map(item => item.close),
       backgroundColor: ['red']
     }]
@@ -19,7 +19,7 @@ function Chart(props) {
   }, [])
   
   return (
-    <Line data={cryptoChart}/>
+    <Line data={chart}/>
   )
 }
 

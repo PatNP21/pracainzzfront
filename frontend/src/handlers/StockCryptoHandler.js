@@ -9,15 +9,12 @@ export default class StockCryptoHandler {
     //TwelveData APIkey
     api_key = 'b6b8fb83c2044518a6c60785a4e9f5fa'
 
-    //finnhub APIkey
-    client_stock = finnhubClient('cd5835aad3i7v64c6g9gcd5835aad3i7v64c6ga0')
-
-    //finnhub
-    finnhub = useFinnhub()
+    //FinnhubAPI key
+    client_stock = 'cd5835aad3i7v64c6g9gcd5835aad3i7v64c6ga0'
 
     //data gotten from TwelveData API
-    stocks //= 'https://api.twelvedata.com/stocks'
-    cryptocurrencies //= 'https://api.twelvedata.com/cryptocurrencies'
+    stocks = 'https://api.twelvedata.com/stocks'
+    cryptocurrencies = 'https://api.twelvedata.com/cryptocurrencies'
 
     //stock
     getAPI(symbol) {
@@ -32,18 +29,11 @@ export default class StockCryptoHandler {
     }
 
     getStocks() {
-        console.log('stocks')
-        /*this.finnhub.stockSymbols("US").then(res => {
-            this.stocks = res.data.filter(item => {
-                return item.type === 'Common Stock' && item.currency.includes('USD')
-            })
-        })*/
+        return axios.get(this.stocks)
     }
 
     getCryptocurrencies() {
-        this.finnhub.cryptoSymbols('BINANCE').then(res => {
-            this.cryptocurrencies = res.data
-        })
+        return axios.get(this.cryptocurrencies)
     }
 
     paymentSession(data) {
@@ -72,5 +62,13 @@ export default class StockCryptoHandler {
 
     getAmountOfCrypto(id) {
         return axios.get(`${this.baseURL}/getCountOfCrypto/${id}`)
+    }
+
+    updateStock(id) {
+        return axios.post(`${this.baseURL}/updateStock`, id)
+    }
+
+    updateCrypto(id) {
+        return axios.post(`${this.baseURL}/updateCrypto`, id)
     }
 }

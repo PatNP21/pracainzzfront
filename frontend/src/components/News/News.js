@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import Header from '../../elements/Header/Header'
 import styled from 'styled-components'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {useFinnhub} from 'react-finnhub'
 import NewsItem from './NewsItem'
 
@@ -31,38 +31,50 @@ const ItemBtn = styled.button`
   border-radius:10px;
   background-color:#ffffff;
 `
+const NewsHeader = styled.div`
+  width: 60vw;
+  height: fit-content;
+  border-radius:10px;
+  box-shadow:0 0 3px #000080;
+  margin:1vh auto;
+  font-family: 'Nunito Sans', sans-serif;
+  text-align:center;
+  font-size:1.5rem;
+  font-weight:500;
+`
 
 function News() {
 
   const [newsList, setNewsList] = useState()
   const navigate = useNavigate()
-  const {state} = useLocation()
   const finnhub = useFinnhub()
 
   useEffect(() => {
-    finnhub.marketNews('merger').then(res => {
-      console.log(res)
+    console.log(finnhub.marketNews)//.marketNews.arguments('merger')   // marketNews('merger').then(res => {
+      /*console.log(res)
       setNewsList(res.data)
       console.log(newsList)
     }).catch(err => {
       console.log(err)
-    })
+    })*/
   }, [])
 
   return (
     <>
       <Header/>
       <Container>
-        {newsList ? newsList.map(item => {
+        {newsList && newsList.map(item => {
           return (
             <ItemBtn onClick={() => {
               console.log(`newsItem selected!`)
               navigate(`/news/${Number(newsList.indexOf(item)+1)}`, {state: item})
             }}>
-              <NewsItem data={item}/>
+              <NewsHeader>
+                {item.headline}
+              </NewsHeader>
             </ItemBtn>
           )
-        }) : <p>Hejo!</p>}
+        })}
       </Container>
     </>
   )

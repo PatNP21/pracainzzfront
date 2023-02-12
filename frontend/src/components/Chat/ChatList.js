@@ -31,54 +31,21 @@ const SearchBtn = styled.input`
 function ChatList() {
 
   const chat_handler = new ChatHandler()
-
-  const [loaded, setLoaded] = useState(false)
-  const {register, handleSubmit} = useForm()
-  let searchContent = ''
   const [usersList, setUsersList] = useState() //returned users from the database
-  var searchList = [] //filtered users by results entered in searchInput
-  const searchListDiv = document.getElementById("searchList")
 
   useEffect(() => {
     chat_handler.getAllUsers().then(res => {
-      console.log(res.data.rows)
       setUsersList(res.data.rows)
-      console.log(usersList)
-      /*searchList = usersList.map(item => {
-        return `${item.firstname} ${item.lastname}`
-      })
-      console.log(searchList)*/
-      setLoaded(true)
-      return usersList
-    }).catch(err => {
-      console.log(err)
     })
   })
 
-  const searchFilter = () => {
-    console.log(usersList.length)
-    return usersList.filter(item => {
-      return item.firstname.toLowerCase().includes(searchContent) || item.lastname.toLowerCase().includes(searchContent)
-    }).map(el => {
-      return el.firstname + " " + el.lastname
-    })
-  }
 
   return (
     <>
       <Header/>
-      <SearchForm>
-        {usersList && <SearchInput 
-          type="text" 
-          placeholder='Search user' 
-          onChange={(e) => {
-            searchContent = e.target.value
-          }}
-        />}
-        <SearchBtn type="submit" value="Search">
-        </SearchBtn>
-        {loaded && <SearchList usersList={usersList}/>}
-      </SearchForm>
+        {usersList && usersList.map(item => {
+            return <ChatPosition user={item}/>
+        })}
       
     </>
   )

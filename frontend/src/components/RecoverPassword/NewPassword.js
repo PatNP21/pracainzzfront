@@ -32,15 +32,11 @@ const Input = styled.input`
 function NewPassword() {
     const {register, handleSubmit} = useForm()
     const navigate = useNavigate()
-    const [cookies] = useCookies()
     const {userID} = useParams()
-
     const account_handler = new AccountHandler()
 
     const onSubmit = (data) => {
-        console.log(data)
         account_handler.setNewPassword(userID, data).then(res => {
-
             navigate('/login/login')
         })
     }
@@ -50,7 +46,7 @@ function NewPassword() {
             <Container>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <InputField>
-                        <Input type="password" placeholder='Enter new pasword' {...register('password')}/>
+                        <Input type="password" placeholder='Enter new password' {...register('password')}/>
                     </InputField>
                     
                     <Input type="submit" value="Submit"/>

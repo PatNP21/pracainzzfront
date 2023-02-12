@@ -38,13 +38,10 @@ justify-content: justify;
 font-family: 'Nunito Sans', sans-serif;
 `
 
-function ExtendedNewsInfo(props) {
+function ExtendedNewsInfo() {
 
   const {state} = useLocation()
 
-  useEffect(() => {
-      console.log(props.data)
-  }, [])
 
   return (
     <Container>

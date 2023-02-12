@@ -8,10 +8,6 @@ export default class ChatHandler {
         return axios.get(`${this.baseURL}`)
     }
 
-    getChats() {
-        
-    }
-
     saveChatMessage(data) {
         return axios.post(`${this.baseURL}/addChatMessage`, data)
     }

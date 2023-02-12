@@ -75,35 +75,20 @@ function PostItem(props) {
     const [loadedState, setLoadedState] = useState(false)
 
     const [author, setAuthor] = useState()
+    const [id, setId] = useState()
     const [openSuccessModal, setOpenSuccessModal] = useState(false)
     const [openFailureModal, setOpenFailureModal] = useState(false)
-
-    let fromBuffer
 
     useEffect(() => {
         post_handler.getAuthorById(props.author).then(res => {
             console.log(res.data.rows[0])
             setAuthor(`${res.data.rows[0].firstname} ${res.data.rows[0].lastname}`)
+            setId(Number(res.data.rows[0].id))
             console.log(author)
             setLoadedState(true)
         })
-        //fromBuffer = btoa(String.fromCharCode(...new Uint8Array(props.multimedia)))
-        console.log(props.multimedia)
-        console.log(fromBuffer)
     }, [])
-
-    const deletePost = (id) => {
-        post_handler.deletePost(id).then(res => {
-            setOpenSuccessModal(true)
-        }).catch(err => {
-            setOpenFailureModal(true)
-        })
-    }
-
-    const editPost = () => {
-
-    }
-
+    
   return (
     <div>
         {loadedState && <Container>
@@ -111,12 +96,12 @@ function PostItem(props) {
             <AuthorHeader>{author}</AuthorHeader>
             {props.author !== cookies.loginData.data.user[0].id &&
                 <DonateButton onClick={() => {
-                    navigate(`/myWallet/${cookies.loginData.data.user[0].id}`)
+                    navigate(`/myWallet/${cookies.loginData.data.user[0].id}`, {state: {level: 'donate', receiver: id}})
                 }}>
                     Donate
                 </DonateButton>
             }
-            <CreatingDate>{props.creatingDate}</CreatingDate>
+            <CreatingDate>{new Date(props.creatingDate).toLocaleDateString('en-CA')}</CreatingDate>
             <Content>
                 {props.content}
             </Content>

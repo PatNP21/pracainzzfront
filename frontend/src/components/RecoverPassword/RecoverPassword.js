@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import {useForm} from 'react-hook-form'
 import styled from 'styled-components'
 import AccountHandler from './../../handlers/AccountHandler'
+import Modal from './../../modals/Modal'
 
 const Container = styled.div`
     width:fit-content;
@@ -30,24 +31,27 @@ const Input = styled.input`
 function RecoverPassword() {
     const {register, handleSubmit} = useForm(false)
     const [sentEmailStatus, setSentEmailStatus] = useState()
+    const [error, setError] = useState(false)
     const account_handler = new AccountHandler()
 
-    const onSubmit = (data) => {
+    const verifyEmail = (data) => {
         console.log(data)
         account_handler.verifyEmail(data).then(res => {
             setSentEmailStatus(true)
+        }).catch(err => {
+            setError(true)
         })
     }
 
     return (
         <Container>
-            {!sentEmailStatus ? <form onSubmit={handleSubmit(onSubmit)}>
+            {!sentEmailStatus ? <form onSubmit={handleSubmit(verifyEmail)}>
                 <InputField>
                     <Input type="text" placeholder='Enter your email' {...register('email')}/>
                 </InputField>
                 
                 <Input type="submit" value="Submit"/>
-            </form> : <p>Your recoverPasword link has been sent. Check your email!</p>}
+            </form> : <p>Your recoverPassword link has been sent. Check your email!</p>}
         </Container>
     )
 }

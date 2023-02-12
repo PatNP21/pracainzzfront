@@ -10,7 +10,6 @@ import Profile from './components/Profile/Profile';
 import RecoverPassword from './components/RecoverPassword/RecoverPassword';
 import NewPassword from './components/RecoverPassword/NewPassword';
 import Stock from './components/Stock/Stock';
-import CryptoPayment from './components/Payment/CryptoPayment';
 import ChatList from './components/Chat/ChatList';
 import Wallet from './components/Wallet/Wallet';
 import { FinnhubProvider } from 'react-finnhub'
@@ -31,7 +30,6 @@ function App() {
           <Route path="login/:sth" element={<Login/>} />
           <Route path="register" element={<Register/>} />
           <Route path="payment" element={<Payment/>}/>
-          <Route path="cryptoPayment" element={<CryptoPayment/>} />
           <Route path="chatList" element={<ChatList/>}/>
           <Route path="chat" element={<Chat/>}>
             <Route path=":userID" element={<Chat/>}/>
@@ -47,7 +45,7 @@ function App() {
           <Route path="recoverPassword" element={<RecoverPassword/>} />
           <Route path="newPassword/:sth/:userID" element={<NewPassword/>} />
           <Route path="myWallet/:userID" element={<Wallet/>}/>
-          <Route path="item/:itemid" element={<ExtendedOwnedItem/>}/>
+          <Route path="item" element={<ExtendedOwnedItem/>}/>
         </Routes>
       </Router>
     </FinnhubProvider>
