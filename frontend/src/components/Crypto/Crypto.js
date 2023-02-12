@@ -86,9 +86,9 @@ function Crypto() {
   }, [])
 
   const getAPI = (optCrypto) => {
-    operateHandler.getAPI(optCrypto).then(res => {
+    operateHandler.getCryptoAPI(optCrypto).then(res => {
       console.log(res)
-      setCryptoData(res.data.data)
+      setCryptoData(res.data.values)
       console.log(cryptoData)
 
       if(cryptoData.length > 0) {
@@ -113,7 +113,7 @@ function Crypto() {
                 onChange={e => {
                   crypto = e.target.value
                   console.log(crypto)
-                  crypto = crypto.slice(crypto.indexOf('/')+1, crypto.length-1)
+                  crypto = crypto.slice(crypto.indexOf('/')+1, crypto.length)
                   getAPI(crypto)
                   setCryptoToBuy(crypto)
                 }}

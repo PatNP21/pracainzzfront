@@ -21,6 +21,7 @@ function CommentList(props) {
     post_handler.getComments(props.post_id).then(res => {
       console.log(res)
       setCommentsList(res.data.rows)
+      console.log(commentsList)
     })
   },[])
 

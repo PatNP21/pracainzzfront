@@ -23,7 +23,7 @@ function App() {
   const {userID} = useParams()
 
   return (
-    <FinnhubProvider client={operateHandler.client_stock}>
+    <FinnhubProvider client="cd5835aad3i7v64c6g9gcd5835aad3i7v64c6ga0">
       <Router>
         <Routes>
           <Route path="" element={<Login/>} />

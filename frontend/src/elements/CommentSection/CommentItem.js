@@ -53,7 +53,6 @@ function CommentItem(props) {
     <div>
         {loadedState && 
         <Container>
-            <Avatar src={avatar}/>
             <AuthorHeader>{author}</AuthorHeader>
             <CreatingDate>{props.creating_date}</CreatingDate>
             <Content>{props.content}</Content>

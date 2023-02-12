@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import {useFinnhub} from 'react-finnhub'
 import NewsItem from './NewsItem'
+import axios from 'axios'
 
 const Container = styled.div`
   width:70vw;
@@ -50,13 +51,13 @@ function News() {
   const finnhub = useFinnhub()
 
   useEffect(() => {
-    console.log(finnhub.marketNews)//.marketNews.arguments('merger')   // marketNews('merger').then(res => {
-      /*console.log(res)
+    axios.get('https://finnhub.io/api/v1/news?category=merger&token=cd5835aad3i7v64c6g9gcd5835aad3i7v64c6ga0').then(res => {
+      console.log(res.data)
       setNewsList(res.data)
       console.log(newsList)
     }).catch(err => {
       console.log(err)
-    })*/
+    })
   }, [])
 
   return (

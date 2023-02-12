@@ -10,6 +10,7 @@ import {useCookies} from 'react-cookie'
 import {useFinnhub} from 'react-finnhub'
 import PostHandler from '../../handlers/PostHandler'
 import StockCryptoHandler from '../../handlers/StockCryptoHandler'
+import axios from 'axios'
 
 const LeftNav = styled.div`
   width:25vw;
@@ -79,16 +80,16 @@ function Dashboard() {
       getPosts(res.data.rows)
     })
 
-    /*finnhub.marketNews('merger').then(res => {
+    axios.get('https://finnhub.io/api/v1/news?category=merger&token=cd5835aad3i7v64c6g9gcd5835aad3i7v64c6ga0').then(res => {
       //res.data - Array
       //console.log(res.data)
       setNewsWidgetItem(res.data[Math.floor(Math.random()*(res.data.length))-1])
       console.log(newsWidgetItem)
     }).catch(err => {
       console.log(err)
-    })*/
+    })
 
-    /*stock_crypto_handler.getStocks().then(res => {
+    stock_crypto_handler.getStocks().then(res => {
       console.log(res.data)
       setStockItem(res.data[Math.floor(Math.random()*(res.data.length))-1])
       console.log(stockItem)
@@ -108,7 +109,7 @@ function Dashboard() {
       })
     }).catch(err => {
       console.log(err)
-    })*/
+    })
 
     stock_crypto_handler.getAmountOfStock(cookies.loginData.data.user[0].id).then(data => {
       console.log(data)

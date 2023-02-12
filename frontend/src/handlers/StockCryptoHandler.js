@@ -24,7 +24,7 @@ export default class StockCryptoHandler {
 
     //crypto
     getCryptoAPI(symbol) {
-        let API = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1min&apikey=${this.api_key}`
+        let API = `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1min&apikey=b6b8fb83c2044518a6c60785a4e9f5fa`
         return axios.get(API)
     }
 
